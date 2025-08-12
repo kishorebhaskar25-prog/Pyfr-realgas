@@ -34,6 +34,12 @@ class TplargsMixin:
             self.p_min = self.cfg.getfloat('solver-interfaces', 'p-min',
                                            5*self._be.fpdtype_eps)
 
+        # Ensure real-gas constants are present in the template constant dict
+        self.c.setdefault('R', rg.R)
+        self.c.setdefault('a', rg.A)
+        self.c.setdefault('b', rg.B)
+        self.c.setdefault('cv', rg.CV)
+
         self._tplargs = dict(ndims=self.ndims, nvars=self.nvars,
                              rsolver=rsolver, c=self.c, p_min=self.p_min,
                              R=rg.R, a=rg.A, b=rg.B, cv=rg.CV)

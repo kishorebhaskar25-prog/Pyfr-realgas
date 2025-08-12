@@ -189,12 +189,12 @@ class NavierStokesSubInflowFtpttangBCInters(NavierStokesBaseBCInters):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        gamma = self.cfg.getfloat('constants', 'gamma')
-
         # Pass boundary constants to the backend
         self.c['cpTt'], = self._eval_opts(['cpTt'])
         self.c['pt'], = self._eval_opts(['pt'])
-        self.c['Rdcp'] = (gamma - 1.0)/gamma
+
+        R, cv = self.c['R'], self.c['cv']
+        self.c['Rdcp'] = R/(R + cv)
 
         # Calculate u, v velocity components from the inflow angle
         theta = self._eval_opts(['theta'])[0]*np.pi/180.0

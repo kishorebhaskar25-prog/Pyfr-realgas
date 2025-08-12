@@ -195,14 +195,20 @@ class EulerElements(BaseFluidElements, BaseAdvectionElements):
         # Register our flux kernels
         self._be.pointwise.register('pyfr.solvers.euler.kernels.tflux')
 
+        # Constants for the flux kernels
+        c = self.cfg.items_as('constants', float)
+        c.setdefault('R', rg.R)
+        c.setdefault('a', rg.A)
+        c.setdefault('b', rg.B)
+        c.setdefault('cv', rg.CV)
+
         # Template parameters for the flux kernels
         tplargs = {
             'ndims': self.ndims,
             'nvars': self.nvars,
             'nverts': len(self.basis.linspts),
-            'c': self.cfg.items_as('constants', float),
-            'jac_exprs': self.basis.jac_exprs,
-            'R': rg.R, 'a': rg.A, 'b': rg.B, 'cv': rg.CV
+            'c': c,
+            'jac_exprs': self.basis.jac_exprs
         }
 
         # Helpers
