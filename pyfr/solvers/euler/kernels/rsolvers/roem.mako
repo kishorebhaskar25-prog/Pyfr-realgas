@@ -3,14 +3,14 @@
 
 // RoeM scheme (ref: JCP 185(2), 342-374)
 <%pyfr:macro name='rsolve' params='ul, ur, n, nf'>
-    // Compute the left and right fluxes + velocities and pressures
+    // Compute the left and right fluxes + velocities, pressures and sounds
     fpdtype_t fl[${ndims}][${nvars}], fr[${ndims}][${nvars}];
     fpdtype_t vl[${ndims}], vr[${ndims}], va[${ndims}], dv[${ndims}];
     fpdtype_t du[${nvars}], bdq[${nvars}];
-    fpdtype_t pl, pr;
+    fpdtype_t pl, pr, al, ar;
 
-    ${pyfr.expand('inviscid_flux', 'ul', 'fl', 'pl', 'vl')};
-    ${pyfr.expand('inviscid_flux', 'ur', 'fr', 'pr', 'vr')};
+    ${pyfr.expand('inviscid_flux', 'ul', 'fl', 'pl', 'al', 'vl')};
+    ${pyfr.expand('inviscid_flux', 'ur', 'fr', 'pr', 'ar', 'vr')};
 
     // Specific enthalpy, contra velocity for left / right
     fpdtype_t hl = (ul[${ndims + 1}] + pl)/ul[0];
@@ -40,7 +40,7 @@
 
     fpdtype_t qq      = ${pyfr.dot('va[{i}]', 'va[{i}]', i=ndims)};
     fpdtype_t contraa = ${pyfr.dot('n[{i}]', 'va[{i}]', i=ndims)};
-    fpdtype_t aa      = sqrt(${c['gamma'] - 1}*(ha - 0.5*qq));
+    fpdtype_t aa      = 0.5*(al + ar);
     fpdtype_t rcp_aa  = 1.0/aa;
 
     // Compute |M|, add a small number to avoid a possible singularity of f

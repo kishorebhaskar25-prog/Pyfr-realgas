@@ -1,7 +1,7 @@
 <%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
 
-<%pyfr:macro name='inviscid_flux' params='s, f, p, v'>
-    fpdtype_t invrho = 1.0/s[0], E = s[${nvars - 1}];
+<%pyfr:macro name='inviscid_flux' params='s, f, p, c, v'>
+    fpdtype_t rho = s[0], invrho = 1.0/rho, E = s[${nvars - 1}];
 
     // Compute the velocities
     fpdtype_t rhov[${ndims}];
@@ -10,8 +10,18 @@
     v[${i}] = invrho*rhov[${i}];
 % endfor
 
+    // Internal energy and temperature
+    fpdtype_t e = E - 0.5*invrho*${pyfr.dot('rhov[{i}]', i=ndims)};
+    fpdtype_t T = (e + a*rho)/cv;
+
     // Compute the pressure
-    p = ${c['gamma'] - 1}*(E - 0.5*invrho*${pyfr.dot('rhov[{i}]', i=ndims)});
+    fpdtype_t vvol = invrho;
+    p = (R*T)/(vvol - b) - a/(vvol*vvol);
+
+    // Compute the local speed of sound
+    fpdtype_t ombr = 1.0 - b*rho;
+    fpdtype_t csq = (R*T/(ombr*ombr))*(1.0 + R/cv) - 2.0*a*rho;
+    c = sqrt(csq);
 
     // Density and energy fluxes
 % for i in range(ndims):
@@ -25,16 +35,26 @@
 % endfor
 </%pyfr:macro>
 
-<%pyfr:macro name='inviscid_flux_1d' params='s, f, p, v'>
-    fpdtype_t invrho = 1.0/s[0], E = s[${nvars - 1}];
+<%pyfr:macro name='inviscid_flux_1d' params='s, f, p, c, v'>
+    fpdtype_t rho = s[0], invrho = 1.0/rho, E = s[${nvars - 1}];
 
     // Compute the velocities
 % for i in range(ndims):
     v[${i}] = invrho*s[${i + 1}];
 % endfor
 
+    // Internal energy and temperature
+    fpdtype_t e = E - 0.5*invrho*${pyfr.dot('s[{i}]', i=(1, ndims + 1))};
+    fpdtype_t T = (e + a*rho)/cv;
+
     // Compute the pressure
-    p = ${c['gamma'] - 1}*(E - 0.5*invrho*${pyfr.dot('s[{i}]', i=(1, ndims + 1))});
+    fpdtype_t vvol = invrho;
+    p = (R*T)/(vvol - b) - a/(vvol*vvol);
+
+    // Compute the local speed of sound
+    fpdtype_t ombr = 1.0 - b*rho;
+    fpdtype_t csq = (R*T/(ombr*ombr))*(1.0 + R/cv) - 2.0*a*rho;
+    c = sqrt(csq);
 
     // Density and energy fluxes
     f[0] = s[1];

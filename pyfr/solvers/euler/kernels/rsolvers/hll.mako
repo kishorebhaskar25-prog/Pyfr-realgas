@@ -2,44 +2,26 @@
 <%include file='pyfr.solvers.euler.kernels.flux'/>
 
 <%pyfr:macro name='rsolve' params='ul, ur, n, nf'>
-    // Compute the left and right fluxes + velocities and pressures
+    // Compute the left and right fluxes + velocities, pressures and sounds
     fpdtype_t fl[${ndims}][${nvars}], fr[${ndims}][${nvars}];
     fpdtype_t vl[${ndims}], vr[${ndims}];
-    fpdtype_t pl, pr;
-    fpdtype_t va[${ndims}];
+    fpdtype_t pl, pr, al, ar;
     fpdtype_t nf_sub, nf_fl, nf_fr;
 
-    ${pyfr.expand('inviscid_flux', 'ul', 'fl', 'pl', 'vl')};
-    ${pyfr.expand('inviscid_flux', 'ur', 'fr', 'pr', 'vr')};
+    ${pyfr.expand('inviscid_flux', 'ul', 'fl', 'pl', 'al', 'vl')};
+    ${pyfr.expand('inviscid_flux', 'ur', 'fr', 'pr', 'ar', 'vr')};
 
     // Get the normal left and right velocities
     fpdtype_t nvl = ${pyfr.dot('n[{i}]', 'vl[{i}]', i=ndims)};
     fpdtype_t nvr = ${pyfr.dot('n[{i}]', 'vr[{i}]', i=ndims)};
 
-    fpdtype_t al = sqrt(${c['gamma']}*pl/ul[0]);
-    fpdtype_t ar = sqrt(${c['gamma']}*pr/ur[0]);
-
-    // Compute the Roe-averaged velocity
+    // Average normal velocity and sound speed
     fpdtype_t nv = (sqrt(ul[0])*nvl + sqrt(ur[0])*nvr)
                  / (sqrt(ul[0]) + sqrt(ur[0]));
-
-    // Compute the Roe-averaged enthalpy
-    fpdtype_t H = (sqrt(ul[0])*(pr + ur[${ndims + 1}])
-                 + sqrt(ur[0])*(pl + ul[${ndims + 1}]))
-                / (sqrt(ul[0])*ur[0] + sqrt(ur[0])*ul[0]);
-
-    fpdtype_t inv_rar = 1 / (sqrt(ul[0]) + sqrt(ur[0]));
-% for i in range(ndims):
-    va[${i}] = (vl[${i}]*sqrt(ul[0]) + vr[${i}]*sqrt(ur[0])) * inv_rar;
-% endfor
-
-    fpdtype_t qq = ${pyfr.dot('va[{i}]', i=ndims)};
-
-    // Roe average speed of sound
-    fpdtype_t a = sqrt(${c['gamma'] - 1}*(H - 0.5*qq));
+    fpdtype_t a = 0.5*(al + ar);
 
     // Estimate the left and right wave speed, sl and sr
-    fpdtype_t sl = min(nv - a, nvl - ar);
+    fpdtype_t sl = min(nv - a, nvl - al);
     fpdtype_t sr = max(nv + a, nvr + ar);
     fpdtype_t rcpsrsl = 1/(sr - sl);
 

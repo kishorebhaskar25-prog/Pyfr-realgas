@@ -6,6 +6,7 @@ from pyfr.solvers.baseadvec import (BaseAdvectionIntInters,
 from pyfr.writers.csv import CSVStream
 
 import numpy as np
+from pyfr.thermo import real_gas as rg
 
 
 class FluidIntIntersMixin:
@@ -34,7 +35,8 @@ class TplargsMixin:
                                            5*self._be.fpdtype_eps)
 
         self._tplargs = dict(ndims=self.ndims, nvars=self.nvars,
-                             rsolver=rsolver, c=self.c, p_min=self.p_min)
+                             rsolver=rsolver, c=self.c, p_min=self.p_min,
+                             R=rg.R, a=rg.A, b=rg.B, cv=rg.CV)
 
 
 class FluidMPIIntersMixin:

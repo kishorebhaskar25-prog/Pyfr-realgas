@@ -4,14 +4,14 @@
 <% eps = 0.001 %>
 
 <%pyfr:macro name='rsolve_1d' params='ul, ur, nf'>
-    // Compute the left and right fluxes + velocities and pressures
+    // Compute the left and right fluxes + velocities, pressures and sounds
     fpdtype_t fl[${nvars}], fr[${nvars}];
     fpdtype_t vl[${ndims}], vr[${ndims}];
-    fpdtype_t pl, pr;
+    fpdtype_t pl, pr, cl, cr;
     fpdtype_t va[${ndims}], dv[${ndims}];
 
-    ${pyfr.expand('inviscid_flux_1d', 'ul', 'fl', 'pl', 'vl')};
-    ${pyfr.expand('inviscid_flux_1d', 'ur', 'fr', 'pr', 'vr')};
+    ${pyfr.expand('inviscid_flux_1d', 'ul', 'fl', 'pl', 'cl', 'vl')};
+    ${pyfr.expand('inviscid_flux_1d', 'ur', 'fr', 'pr', 'cr', 'vr')};
 
     // Compute Roe averaged density and enthalpy
     fpdtype_t roa = sqrt(ul[0])*sqrt(ur[0]);
@@ -25,7 +25,7 @@
 % endfor
 
     fpdtype_t qq = ${pyfr.dot('va[{i}]', i=ndims)};
-    fpdtype_t a = sqrt(${c['gamma'] - 1}*(ha - 0.5*qq));
+    fpdtype_t a = 0.5*(cl + cr);
 
     // Compute the Eigenvalues
     fpdtype_t l1 = fabs(va[0] - a);
