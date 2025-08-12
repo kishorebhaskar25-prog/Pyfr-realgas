@@ -36,7 +36,7 @@
     fpdtype_t p, c, v[${ndims}];
     fpdtype_t Rgas = ${c['R']}, ag = ${c['a']}, bg = ${c['b']}, cvg = ${c['cv']};
     ${pyfr.expand('inviscid_flux', 'u', 'ftemp', 'p', 'c', 'v', 'Rgas', 'ag', 'bg', 'cvg')};
-    ${pyfr.expand('viscous_flux_add', 'u', gradu, 'ftemp')};
+    ${pyfr.expand('viscous_flux_add', 'u', gradu, 'ftemp', 'Rgas', 'ag', 'bg', 'cvg')};
     ${pyfr.expand('artificial_viscosity_add', gradu, 'ftemp', 'artvisc')};
 
     // Transform the fluxes
