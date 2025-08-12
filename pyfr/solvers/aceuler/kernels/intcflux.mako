@@ -10,9 +10,12 @@
     fpdtype_t mag_nl = sqrt(${pyfr.dot('nl[{i}]', i=ndims)});
     fpdtype_t norm_nl[] = ${pyfr.array('(1 / mag_nl)*nl[{i}]', i=ndims)};
 
+    fpdtype_t R = ${R}, a = ${a}, b = ${b}, cv = ${cv},
+              T = ${T}, pinf = ${pinf};
+
     // Perform the Riemann solve
     fpdtype_t fn[${nvars}];
-    ${pyfr.expand('rsolve', 'ul', 'ur', 'norm_nl', 'fn')};
+    ${pyfr.expand('rsolve', 'ul', 'ur', 'norm_nl', 'fn', 'R', 'a', 'b', 'cv', 'T', 'pinf')};
 
     // Scale and write out the common normal fluxes
 % for i in range(nvars):

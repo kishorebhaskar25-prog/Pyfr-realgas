@@ -33,7 +33,8 @@
 
     // Compute the flux (F = Fi + Fv)
     fpdtype_t ftemp[${ndims}][${nvars}];
-    ${pyfr.expand('inviscid_flux', 'u', 'ftemp')};
+    fpdtype_t R = ${R}, a = ${a}, b = ${b}, T = ${T}, pinf = ${pinf};
+    ${pyfr.expand('inviscid_flux', 'u', 'ftemp', 'R', 'a', 'b', 'T', 'pinf')};
     ${pyfr.expand('viscous_flux_add', 'u', gradu, 'ftemp')};
 
     // Transform the fluxes

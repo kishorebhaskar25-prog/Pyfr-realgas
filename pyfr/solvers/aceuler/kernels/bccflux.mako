@@ -20,7 +20,7 @@
 
     // Perform the Riemann solve
     fpdtype_t fn[${nvars}];
-    ${pyfr.expand('rsolve', 'ul', 'ur', 'norm_nl', 'fn')};
+    ${pyfr.expand('rsolve', 'ul', 'ur', 'norm_nl', 'fn', 'Rgas', 'ag', 'bg', 'cvg', 'T0', 'p0')};
 
     // Scale and write out the common normal fluxes
 % for i in range(nvars):
