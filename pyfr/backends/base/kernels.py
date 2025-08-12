@@ -6,6 +6,10 @@ import numpy as np
 from pyfr.cache import memoize
 
 
+def fmt_float(f):
+    return f"{float(f):.17g}"
+
+
 class Kernel:
     compound = False
 
@@ -83,6 +87,7 @@ class BasePointwiseKernelProvider(BaseKernelProvider):
                 return v
 
         tplargs = {k: coerce(v) for k, v in dict(tplargs).items()}
+        tplargs['fmt'] = fmt_float
 
         # Backend-specfic generator classes
         tplargs['_kernel_generator'] = self.kernel_generator_cls
