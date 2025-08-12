@@ -4,7 +4,7 @@
 from pyfr.thermo import real_gas as rg
 %>
 
-<%pyfr:macro name='bc_rsolve_state' params='ul, nl, ur, Rgas, ag, bg, cvg, cpg, T0, p0' externs='ploc, t'>
+<%pyfr:macro name='bc_rsolve_state' params='ul, nl, ur, Rgas, ag, bg, cvg, T0, p0' externs='ploc, t'>
     const fpdtype_t rho0 = ${rg.rho_from_pT(p0, T0, Rgas, ag, bg)};
     const fpdtype_t zeta = ${rg.sound_speed_sq(rho0, T0, Rgas, ag, bg, cvg)};
 
