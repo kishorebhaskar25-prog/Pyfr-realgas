@@ -3,6 +3,7 @@ import importlib.util as imu
 from pathlib import Path
 
 import numpy as np
+import pytest
 from mako.template import Template
 
 
@@ -84,4 +85,34 @@ ${a*b}
     src, ndim, argn, argt = provider._render_kernel('foo', 'foo', {}, tplargs)
 
     assert '0.6666666666666666' in src
+
+
+def test_string_tplarg_rejected():
+    tplsrc = """
+<%
+_kernel_argspecs['foo'] = (0, [], [])
+%>
+${x}
+"""
+
+    backend = DummyBackend(tplsrc)
+    provider = DummyProvider(backend)
+
+    with pytest.raises(TypeError):
+        provider._render_kernel('foo', 'foo', {}, {'x': '1'})
+
+
+def test_bytes_tplarg_rejected():
+    tplsrc = """
+<%
+_kernel_argspecs['foo'] = (0, [], [])
+%>
+${x}
+"""
+
+    backend = DummyBackend(tplsrc)
+    provider = DummyProvider(backend)
+
+    with pytest.raises(TypeError):
+        provider._render_kernel('foo', 'foo', {}, {'x': b'1'})
 
