@@ -68,3 +68,20 @@ ${i}
 
     assert '0\n1\n2\n3' in src
 
+
+def test_numeric_param_multiplication():
+    tplsrc = """
+<%
+_kernel_argspecs['foo'] = (0, [], [])
+%>
+${fmt(a*b)}
+"""
+
+    backend = DummyBackend(tplsrc)
+    provider = DummyProvider(backend)
+
+    tplargs = {'a': np.int32(2), 'b': np.float64(1 / 3)}
+    src, ndim, argn, argt = provider._render_kernel('foo', 'foo', {}, tplargs)
+
+    assert '0.66666666666666663' in src
+
