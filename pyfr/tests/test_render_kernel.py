@@ -36,13 +36,13 @@ def test_render_kernel_numeric_coercion():
 <%
 _kernel_argspecs['foo'] = (0, [], [])
 %>
-${x} ${y}
+${x} ${fmt(x)}
 '''
     backend = DummyBackend(tplsrc)
     provider = DummyProvider(backend)
 
-    tplargs = {'x': 1/3, 'y': np.float64(1/7)}
+    tplargs = {'x': 1 / 3}
     src, ndim, argn, argt = provider._render_kernel('foo', 'foo', {}, tplargs)
 
+    assert '0.3333333333333333' in src
     assert '0.33333333333333331' in src
-    assert '0.14285714285714285' in src
