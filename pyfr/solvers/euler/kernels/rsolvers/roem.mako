@@ -9,8 +9,10 @@
     fpdtype_t du[${nvars}], bdq[${nvars}];
     fpdtype_t pl, pr, al, ar;
 
-    ${pyfr.expand('inviscid_flux', 'ul', 'fl', 'pl', 'al', 'vl')};
-    ${pyfr.expand('inviscid_flux', 'ur', 'fr', 'pr', 'ar', 'vr')};
+    fpdtype_t Rgas = ${c['R']}, ag = ${c['a']}, bg = ${c['b']}, cvg = ${c['cv']};
+
+    ${pyfr.expand('inviscid_flux', 'ul', 'fl', 'pl', 'al', 'vl', 'Rgas', 'ag', 'bg', 'cvg')};
+    ${pyfr.expand('inviscid_flux', 'ur', 'fr', 'pr', 'ar', 'vr', 'Rgas', 'ag', 'bg', 'cvg')};
 
     // Specific enthalpy, contra velocity for left / right
     fpdtype_t hl = (ul[${ndims + 1}] + pl)/ul[0];
