@@ -24,7 +24,10 @@ class TplargsMixin:
                                            5*self._be.fpdtype_eps)
 
         for k, v in [('R', rg.R), ('a', rg.A), ('b', rg.B), ('cv', rg.CV)]:
-            self.c.setdefault(k, v)
+            self._get_const(k, v)
+
+        for k in ['mu', 'cpTref', 'cpTs', 'Pr']:
+            self._get_const(k)
 
         self._tplargs = dict(ndims=self.ndims, nvars=self.nvars,
                              rsolver=rsolver, visc_corr=visc_corr,
@@ -215,7 +218,7 @@ class NavierStokesSubOutflowBCInters(NavierStokesBaseBCInters):
         self.c |= self._exp_opts(['p'], lhs)
 
 
-class NavierStokesCharRiemInvMassFlowBCInters(MassFlowBCMixin, 
+class NavierStokesCharRiemInvMassFlowBCInters(MassFlowBCMixin,
                                               NavierStokesBaseBCInters):
     type = 'char-riem-inv-mass-flow'
     cflux_state = 'ghost'
