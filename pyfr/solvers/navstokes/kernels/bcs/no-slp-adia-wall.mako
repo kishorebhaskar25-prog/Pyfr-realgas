@@ -1,7 +1,7 @@
 <%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
 <%include file='pyfr.solvers.navstokes.kernels.bcs.common'/>
 
-<%pyfr:macro name='bc_rsolve_state' params='ul, nl, ur' externs='ploc, t'>
+<%pyfr:macro name='bc_rsolve_state' params='ul, nl, ur, R, a, b, cv' externs='ploc, t'>
     ur[0] = ul[0];
 % for i in range(ndims):
     ur[${i + 1}] = -ul[${i + 1}];
@@ -9,7 +9,7 @@
     ur[${nvars - 1}] = ul[${nvars - 1}];
 </%pyfr:macro>
 
-<%pyfr:macro name='bc_ldg_state' params='ul, nl, ur' externs='ploc, t'>
+<%pyfr:macro name='bc_ldg_state' params='ul, nl, ur, R, a, b, cv' externs='ploc, t'>
     ur[0] = ul[0];
 % for i in range(ndims):
     ur[${i + 1}] = 0.0;
@@ -18,7 +18,7 @@
                      - (0.5/ul[0])*${pyfr.dot('ul[{i}]', i=(1, ndims + 1))};
 </%pyfr:macro>
 
-<%pyfr:macro name='bc_ldg_grad_state' params='ur, nl, grad_ul, grad_ur'>
+<%pyfr:macro name='bc_ldg_grad_state' params='ur, nl, grad_ul, grad_ur, R, a, b, cv'>
     fpdtype_t rcprho = 1.0/ur[0];
 
 % if ndims == 2:
@@ -36,7 +36,7 @@
                                       + u*u_y + v*v_y);
 
     // Copy all fluid-side gradients across to wall-side gradients
-    ${pyfr.expand('bc_common_grad_copy', 'ur', 'nl', 'grad_ul', 'grad_ur')};
+    ${pyfr.expand('bc_common_grad_copy', 'ur', 'nl', 'grad_ul', 'grad_ur', 'R', 'a', 'b', 'cv')};
 
     // Correct copied across in-fluid temp gradients to in-wall gradients
     grad_ur[0][3] -= nl[0]*nl[0]*Tl_x + nl[0]*nl[1]*Tl_y;
@@ -65,7 +65,7 @@
                                       + u*u_z + v*v_z + w*w_z);
 
     // Copy all fluid-side gradients across to wall-side gradients
-    ${pyfr.expand('bc_common_grad_copy', 'ur', 'nl', 'grad_ul', 'grad_ur')};
+    ${pyfr.expand('bc_common_grad_copy', 'ur', 'nl', 'grad_ul', 'grad_ur', 'R', 'a', 'b', 'cv')};
 
     // Correct copied across in-fluid temp gradients to in-wall gradients
     grad_ur[0][4] -= nl[0]*nl[0]*Tl_x + nl[0]*nl[1]*Tl_y + nl[0]*nl[2]*Tl_z;

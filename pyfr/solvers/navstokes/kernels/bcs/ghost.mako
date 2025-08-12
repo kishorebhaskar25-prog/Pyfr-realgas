@@ -6,19 +6,19 @@
 
 <% tau = c['ldg-tau'] %>
 
-<%pyfr:macro name='bc_common_flux_state' params='ul, gradul, artviscl, nl, magnl'>
+<%pyfr:macro name='bc_common_flux_state' params='ul, gradul, artviscl, nl, magnl, R, a, b, cv'>
     // Viscous states
     fpdtype_t ur[${nvars}], gradur[${ndims}][${nvars}];
-    ${pyfr.expand('bc_ldg_state', 'ul', 'nl', 'ur')};
-    ${pyfr.expand('bc_ldg_grad_state', 'ul', 'nl', 'gradul', 'gradur')};
+    fpdtype_t Rgas = R, ag = a, bg = b, cvg = cv;
+    ${pyfr.expand('bc_ldg_state', 'ul', 'nl', 'ur', 'Rgas', 'ag', 'bg', 'cvg')};
+    ${pyfr.expand('bc_ldg_grad_state', 'ul', 'nl', 'gradul', 'gradur', 'Rgas', 'ag', 'bg', 'cvg')};
 
-    fpdtype_t Rgas = ${c['R']}, ag = ${c['a']}, bg = ${c['b']}, cvg = ${c['cv']};
     fpdtype_t fvr[${ndims}][${nvars}] = {{0}};
     ${pyfr.expand('viscous_flux_add', 'ur', 'gradur', 'fvr', 'Rgas', 'ag', 'bg', 'cvg')};
     ${pyfr.expand('artificial_viscosity_add', 'gradur', 'fvr', 'artviscl')};
 
     // Inviscid (Riemann solve) state
-    ${pyfr.expand('bc_rsolve_state', 'ul', 'nl', 'ur')};
+    ${pyfr.expand('bc_rsolve_state', 'ul', 'nl', 'ur', 'Rgas', 'ag', 'bg', 'cvg')};
 
     // Perform the Riemann solve
     fpdtype_t ficomm[${nvars}], fvcomm;
