@@ -6,6 +6,8 @@
               u='in fpdtype_t[${str(nupts)}][${str(nvars)}]'
               entmin_int='out fpdtype_t[${str(nfaces)}]'
               m0='in broadcast fpdtype_t[${str(nfpts)}][${str(nupts)}]'>
+    fpdtype_t Rgas = ${c['R']}, ag = ${c['a']}, bg = ${c['b']}, cvg = ${c['cv']};
+
     // Compute minimum entropy across element
     fpdtype_t ui[${nvars}], d, p, e;
 
@@ -16,7 +18,7 @@
         ui[${j}] = u[i][${j}];
     % endfor
 
-        ${pyfr.expand('compute_entropy', 'ui', 'd', 'p', 'e')};
+        ${pyfr.expand('compute_entropy', 'ui', 'd', 'p', 'e', 'Rgas', 'ag', 'bg', 'cvg')};
 
         entmin = fmin(entmin, e);
     }
@@ -28,7 +30,7 @@
         % for vidx in range(nvars):
         uf[${vidx}] = ${pyfr.dot('m0[fidx][{k}]', f'u[{{k}}][{vidx}]', k=nupts)};
         % endfor
-        ${pyfr.expand('compute_entropy', 'uf', 'd', 'p', 'e')};
+        ${pyfr.expand('compute_entropy', 'uf', 'd', 'p', 'e', 'Rgas', 'ag', 'bg', 'cvg')};
         entmin = fmin(entmin, e);
     }
     % endif
