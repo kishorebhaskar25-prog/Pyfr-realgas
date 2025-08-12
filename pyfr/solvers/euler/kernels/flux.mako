@@ -14,12 +14,10 @@
     fpdtype_t e = E - 0.5*invrho*${pyfr.dot('rhov[{i}]', i=ndims)};
     fpdtype_t T = (e + a*rho)/cv;
 
-    // Compute the pressure
-    fpdtype_t vvol = invrho;
-    p = (R*T)/(vvol - b) - a/(vvol*vvol);
-
-    // Compute the local speed of sound
+    // Compute the pressure and local speed of sound using the
+    // real-gas (van der Waals) equation of state
     fpdtype_t ombr = 1.0 - b*rho;
+    p = (rho*R*T)/ombr - a*rho*rho;
     fpdtype_t csq = (R*T/(ombr*ombr))*(1.0 + R/cv) - 2.0*a*rho;
     c = sqrt(csq);
 
@@ -47,12 +45,10 @@
     fpdtype_t e = E - 0.5*invrho*${pyfr.dot('s[{i}]', i=(1, ndims + 1))};
     fpdtype_t T = (e + a*rho)/cv;
 
-    // Compute the pressure
-    fpdtype_t vvol = invrho;
-    p = (R*T)/(vvol - b) - a/(vvol*vvol);
-
-    // Compute the local speed of sound
+    // Compute the pressure and local speed of sound using the
+    // real-gas (van der Waals) equation of state
     fpdtype_t ombr = 1.0 - b*rho;
+    p = (rho*R*T)/ombr - a*rho*rho;
     fpdtype_t csq = (R*T/(ombr*ombr))*(1.0 + R/cv) - 2.0*a*rho;
     c = sqrt(csq);
 
