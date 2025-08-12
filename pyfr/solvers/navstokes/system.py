@@ -16,7 +16,8 @@ class NavierStokesSystem(BaseAdvectionDiffusionSystem):
 
     def __init__(self, backend, mesh, initsoln, nregs, cfg):
         # Ensure real-gas constants are available to all kernels
-        for k, v in [('R', rg.R), ('a', rg.A), ('b', rg.B), ('cv', rg.CV)]:
+        rg_consts = [('R', rg.R), ('a', rg.A), ('b', rg.B), ('cv', rg.CV)]
+        for k, v in rg_consts:
             if not cfg.hasopt('constants', k):
                 cfg.set('constants', k, str(v))
 

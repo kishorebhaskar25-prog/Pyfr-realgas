@@ -23,10 +23,8 @@ class TplargsMixin:
             self.p_min = self.cfg.getfloat('solver-interfaces', 'p-min',
                                            5*self._be.fpdtype_eps)
 
-        self.c.setdefault('R', rg.R)
-        self.c.setdefault('a', rg.A)
-        self.c.setdefault('b', rg.B)
-        self.c.setdefault('cv', rg.CV)
+        for k, v in [('R', rg.R), ('a', rg.A), ('b', rg.B), ('cv', rg.CV)]:
+            self.c.setdefault(k, v)
 
         self._tplargs = dict(ndims=self.ndims, nvars=self.nvars,
                              rsolver=rsolver, visc_corr=visc_corr,
@@ -193,9 +191,6 @@ class NavierStokesSubInflowFtpttangBCInters(NavierStokesBaseBCInters):
         # Pass boundary constants to the backend
         self.c['cpTt'], = self._eval_opts(['cpTt'])
         self.c['pt'], = self._eval_opts(['pt'])
-
-        R, cv = self.c['R'], self.c['cv']
-        self.c['Rdcp'] = R/(R + cv)
 
         # Calculate u, v velocity components from the inflow angle
         theta = self._eval_opts(['theta'])[0]*np.pi/180.0
