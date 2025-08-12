@@ -494,7 +494,7 @@ def process_resample(args):
         stats.set('data', 'prefix', prefix)
         stats.set('data', 'fields', ssoln['stats'].get('data', 'fields'))
         stats.set('solver-time-integrator', 'tcurr',
-                  ssoln['stats'].get('solver-time-integrator', 'tcurr'))
+                  ssoln['stats'].getfloat('solver-time-integrator', 'tcurr'))
         metadata = {'config': tcfg.tostr(), 'stats': stats.tostr(),
                     'mesh-uuid': treader.mesh.uuid}
     else:
