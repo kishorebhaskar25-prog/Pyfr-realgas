@@ -1,7 +1,7 @@
 <%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
 <%include file='pyfr.solvers.euler.kernels.flux'/>
 
-<% gamma = c['gamma'] %>
+<% gamma = 1 + R/cv %>
 <% hgm = 0.5*(gamma - 1) %>
 <% grgm = gamma/(gamma - 1) %>
 <% trgm = 2/(gamma - 1) %>
