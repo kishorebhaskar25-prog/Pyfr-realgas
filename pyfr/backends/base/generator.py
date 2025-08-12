@@ -133,6 +133,15 @@ class BaseKernelGenerator:
     def render(self):
         pass
 
+    def _postprocess_src(self, src):
+        if self.fpdtype == np.float32:
+            src = re.sub(
+                r'(?=\d*[.eE])(?=\.?\d)\d*\.?\d*(?:[eE][+-]?\d+)?(?![A-Za-z_])',
+                r'\g<0>f',
+                src,
+            )
+        return src
+
     def _match_arg(self, arg):
         bmtch = r'\[({0})\]'.format(match_paired_paren('[]'))
         ptrns = [r'\b{0}\b', fr'\b{{0}}{bmtch}', fr'\b{{0}}{bmtch*2}']
@@ -231,11 +240,6 @@ class BaseKernelGenerator:
         return f'{arg.name}_v[{ix}]'
 
     def _render_body(self, body):
-        # At single precision suffix all floating point constants by 'f'
-        if self.fpdtype == np.float32:
-            body = re.sub(r'(?=\d*[.eE])(?=\.?\d)\d*\.?\d*(?:[eE][+-]?\d+)?(?![A-Za-z_])',
-                          r'\g<0>f', body)
-
         # Dereference vector arguments
         for va in self.vectargs:
             subp = self._match_arg(va)
@@ -380,7 +384,7 @@ class BaseGPUKernelGenerator(BaseKernelGenerator):
     def render(self):
         spec = self._render_spec()
 
-        return f'''{spec}
+        src = f'''{spec}
             {{
                 ixdtype_t _x = {self._gid};
                 #define X_IDX (_x)
@@ -394,3 +398,5 @@ class BaseGPUKernelGenerator(BaseKernelGenerator):
                 #undef X_IDX_AOSOA
                 #undef BCAST_BLK
             }}'''
+
+        return self._postprocess_src(src)
