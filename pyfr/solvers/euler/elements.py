@@ -1,6 +1,7 @@
 import numpy as np
 
 from pyfr.solvers.baseadvec import BaseAdvectionElements
+from pyfr.thermo import real_gas as rg
 
 
 class BaseFluidElements:
@@ -42,9 +43,13 @@ class BaseFluidElements:
         # Multiply velocity components by rho
         rhovs = [rho*c for c in pris[1:-1]]
 
-        # Compute the energy
-        gamma = cfg.getfloat('constants', 'gamma')
-        E = p/(gamma - 1) + 0.5*rho*sum(c*c for c in pris[1:-1])
+        # Recover temperature from pressure and density
+        v = 1.0 / rho
+        T = (p + rg.A*rho*rho) * (v - rg.B) / rg.R
+
+        # Compute the energy using the real gas model
+        e = rg.energy(rho, T)
+        E = e + 0.5*rho*sum(c*c for c in pris[1:-1])
 
         return [rho, *rhovs, E]
 
@@ -55,9 +60,12 @@ class BaseFluidElements:
         # Divide momentum components by rho
         vs = [rhov/rho for rhov in cons[1:-1]]
 
-        # Compute the pressure
-        gamma = cfg.getfloat('constants', 'gamma')
-        p = (gamma - 1)*(E - 0.5*rho*sum(v**2 for v in vs))
+        # Internal energy and temperature
+        e = E - 0.5*rho*sum(v**2 for v in vs)
+        T = rg.T_from_rho_e(rho, e)
+
+        # Compute the pressure using the real gas model
+        p = rg.pressure(rho, T)
 
         return [rho, *vs, p]
 
@@ -73,11 +81,17 @@ class BaseFluidElements:
         diff_uvw = [(diff_rhov - v*diff_rho) / rho
                     for diff_rhov, v in zip(diff_rhouvw, uvw)]
 
-        # Pressure gradient: ∂p = (γ - 1)·[∂E - 1/2*(u⃗·∂(ρu⃗) + ρu⃗·∂u⃗)]
-        gamma = cfg.getfloat('constants', 'gamma')
-        diff_p = diff_E - 0.5*(sum(u*dru for u, dru in zip(uvw, diff_rhouvw)) +
-                               sum(ru*du for ru, du in zip(rhouvw, diff_uvw)))
-        diff_p *= gamma - 1
+        # Temperature differential
+        ke = sum(v*v for v in uvw)
+        e = cons[-1] - 0.5*rho*ke
+        diff_e = diff_E - sum(v*dr for v, dr in zip(uvw, diff_rhouvw)) + 0.5*ke*diff_rho
+        diff_T = (diff_e + rg.A*diff_rho) / rg.CV
+
+        # Pressure differential from Van der Waals equation
+        v = 1.0 / rho
+        T = rg.T_from_rho_e(rho, e)
+        diff_p = (rg.R/(v - rg.B))*diff_T + \
+                 (rg.R*T*v*v/(v - rg.B)**2 - 2*rg.A/v)*diff_rho
 
         return [diff_rho, *diff_uvw, diff_p]
 

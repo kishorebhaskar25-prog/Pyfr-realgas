@@ -2,6 +2,7 @@ import numpy as np
 
 from pyfr.solvers.baseadvecdiff import BaseAdvectionDiffusionElements
 from pyfr.solvers.euler.elements import BaseFluidElements
+from pyfr.thermo import real_gas as rg
 
 
 class NavierStokesElements(BaseFluidElements, BaseAdvectionDiffusionElements):
@@ -20,11 +21,17 @@ class NavierStokesElements(BaseFluidElements, BaseAdvectionDiffusionElements):
         grad_uvw = [(grad_rhov - v*grad_rho) / rho
                     for grad_rhov, v in zip(grad_rhouvw, uvw)]
 
-        # Pressure gradient: ∇p = (γ - 1)·[∇E - 1/2*(u⃗·∇(ρu⃗) - ρu⃗·∇u⃗)]
-        gamma = cfg.getfloat('constants', 'gamma')
-        grad_p = grad_E - 0.5*(np.einsum('ijk,iljk->ljk', uvw, grad_rhouvw) +
-                               np.einsum('ijk,iljk->ljk', rhouvw, grad_uvw))
-        grad_p *= (gamma - 1)
+        # Temperature gradient
+        kin = sum(u*u for u in uvw)
+        e = cons[-1] - 0.5*rho*kin
+        grad_e = grad_E - np.einsum('ijk,iljk->ljk', uvw, grad_rhouvw) + 0.5*kin*grad_rho
+        grad_T = (grad_e + rg.A*grad_rho) / rg.CV
+
+        # Pressure gradient from Van der Waals equation
+        v = 1.0 / rho
+        T = rg.T_from_rho_e(rho, e)
+        term = (rg.R*T*v*v/(v - rg.B)**2 - 2*rg.A/v)
+        grad_p = (rg.R/(v - rg.B))*grad_T + term*grad_rho
 
         return [grad_rho, *grad_uvw, grad_p]
 

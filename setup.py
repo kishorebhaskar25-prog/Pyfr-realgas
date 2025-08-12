@@ -65,7 +65,8 @@ modules = [
     'pyfr.solvers.navstokes.kernels',
     'pyfr.solvers.navstokes.kernels.bcs',
     'pyfr.writers',
-    'pyfr.writers.vtk'
+    'pyfr.writers.vtk',
+    'pyfr.thermo'
 ]
 
 # Tests
