@@ -11,8 +11,8 @@
     fpdtype_t norm_nl[] = ${pyfr.array('(1 / mag_nl)*nlin[{i}]', i=ndims)};
 
     fpdtype_t Rgas = ${R}, ag = ${a}, bg = ${b}, cvg = ${cv},
-              cpg = ${cp}, T0 = ${T}, p0 = ${pinf};
+              T0 = ${T}, p0 = ${pinf};
 
     ${pyfr.expand('bc_ldg_state', 'ulin', 'norm_nl', 'ulout',
-                  'Rgas', 'ag', 'bg', 'cvg', 'cpg', 'T0', 'p0')};
+                  'Rgas', 'ag', 'bg', 'cvg', 'T0', 'p0')};
 </%pyfr:kernel>
