@@ -80,8 +80,18 @@ class BasePointwiseKernelProvider(BaseKernelProvider):
         # Backchannel for obtaining kernel argument types
         tplargs['_kernel_argspecs'] = argspecs = {}
 
-        # Render the template to yield the source code
-        tpl = self.backend.lookup.get_template(mod)
+        # Render the template to yield the source code.  If the template
+        # corresponding to a real-gas acoustic kernel is not present then
+        # raise a descriptive error rather than silently allowing the
+        # ideal-gas implementation to be used.
+        try:
+            tpl = self.backend.lookup.get_template(mod)
+        except RuntimeError as e:
+            if 'solvers.aceuler' in mod or 'solvers.acnavstokes' in mod:
+                raise RuntimeError(
+                    f'Real-gas acoustic kernel "{mod}" not implemented')
+            else:
+                raise
         src = tpl.render(**tplargs)
         src = re.sub(r'\n\n+', r'\n\n', src)
 
