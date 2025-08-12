@@ -2,7 +2,7 @@
 <%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
 <%include file='pyfr.solvers.euler.kernels.entropy'/>
 
-<%pyfr:macro name='get_minima' params='u, m0, dmin, pmin, emin'>
+<%pyfr:macro name='get_minima' params='u, m0, dmin, pmin, emin, R, a, b, cv'>
     fpdtype_t d, p, e;
     fpdtype_t ui[${nvars}];
 
@@ -14,7 +14,7 @@
         ui[${j}] = u[i][${j}];
     % endfor
 
-        ${pyfr.expand('compute_entropy', 'ui', 'd', 'p', 'e')};
+        ${pyfr.expand('compute_entropy', 'ui', 'd', 'p', 'e', 'R', 'a', 'b', 'cv')};
         dmin = fmin(dmin, d); pmin = fmin(pmin, p); emin = fmin(emin, e);
     }
 
@@ -26,7 +26,7 @@
         uf[${vidx}] = ${pyfr.dot('m0[fidx][{k}]', f'u[{{k}}][{vidx}]', k=nupts)};
         % endfor
 
-        ${pyfr.expand('compute_entropy', 'uf', 'd', 'p', 'e')};
+        ${pyfr.expand('compute_entropy', 'uf', 'd', 'p', 'e', 'R', 'a', 'b', 'cv')};
         dmin = fmin(dmin, d); pmin = fmin(pmin, p); emin = fmin(emin, e);
     }
     % endif
@@ -61,7 +61,7 @@
     }
 </%pyfr:macro>
 
-<%pyfr:macro name='apply_filter_single' params='up, f, d, p, e'>
+<%pyfr:macro name='apply_filter_single' params='up, f, d, p, e, R, a, b, cv'>
     // Start accumulation
     fpdtype_t ui[${nvars}];
 % for vidx in range(nvars):
@@ -81,7 +81,7 @@
         % endfor
     }
 
-    ${pyfr.expand('compute_entropy', 'ui', 'd', 'p', 'e' )};
+    ${pyfr.expand('compute_entropy', 'ui', 'd', 'p', 'e', 'R', 'a', 'b', 'cv' )};
 </%pyfr:macro>
 
 <%pyfr:kernel name='entropyfilter' ndim='1'
@@ -91,13 +91,14 @@
               invvdm='in broadcast fpdtype_t[${str(nupts)}][${str(nupts)}]'
               m0='in broadcast fpdtype_t[${str(nfpts)}][${str(nupts)}]'>
     fpdtype_t dmin, pmin, emin;
+    fpdtype_t Rgas = ${c['R']}, ag = ${c['a']}, bg = ${c['b']}, cvg = ${c['cv']};
 
     // Compute minimum entropy from current and adjacent elements
     fpdtype_t entmin = ${fpdtype_max};
     for (int fidx = 0; fidx < ${nfaces}; fidx++) entmin = fmin(entmin, entmin_int[fidx]);
 
     // Check if solution is within bounds
-    ${pyfr.expand('get_minima', 'u', 'm0', 'dmin', 'pmin', 'emin')};
+    ${pyfr.expand('get_minima', 'u', 'm0', 'dmin', 'pmin', 'emin', 'Rgas', 'ag', 'bg', 'cvg')};
 
     // Filter if out of bounds
     if (dmin < ${d_min} || pmin < ${p_min} || emin < entmin - ${e_tol})
@@ -110,7 +111,7 @@
                                      for j, jx in enumerate(meanwts) if jx != 0)};
         % endfor
 
-        ${pyfr.expand('compute_entropy', 'uavg', 'davg', 'pavg', 'eavg')};
+          ${pyfr.expand('compute_entropy', 'uavg', 'davg', 'pavg', 'eavg', 'Rgas', 'ag', 'bg', 'cvg')};
 
         // Apply density, pressure, and entropy limiting sequentially
         fpdtype_t alpha;
@@ -124,7 +125,7 @@
             u[${uidx}][${vidx}] += alpha*(uavg[${vidx}] - u[${uidx}][${vidx}]);
             % endfor
 
-            ${pyfr.expand('get_minima', 'u', 'm0', 'dmin', 'pmin', 'emin')};
+            ${pyfr.expand('get_minima', 'u', 'm0', 'dmin', 'pmin', 'emin', 'Rgas', 'ag', 'bg', 'cvg')};
         }
         % endfor
         % else:
@@ -156,7 +157,7 @@
             % endfor
 
             // Compute constraints with current minimum f value
-            ${pyfr.expand('apply_filter_single', 'up', 'f', 'd', 'p', 'e')};
+              ${pyfr.expand('apply_filter_single', 'up', 'f', 'd', 'p', 'e', 'Rgas', 'ag', 'bg', 'cvg')};
 
             // Update f if constraints aren't satisfied
             if (d < ${d_min} || p < ${p_min} || e < entmin - ${e_tol})
@@ -172,7 +173,7 @@
                     fnew = 0.5*(f_low + f_high);
 
                     // Compute filtered state
-                    ${pyfr.expand('apply_filter_single', 'up', 'fnew', 'd', 'p', 'e')};
+                      ${pyfr.expand('apply_filter_single', 'up', 'fnew', 'd', 'p', 'e', 'Rgas', 'ag', 'bg', 'cvg')};
 
                     // Update brackets
                     if (d < ${d_min} || p < ${p_min} || e < entmin - ${e_tol})
@@ -190,7 +191,7 @@
         ${pyfr.expand('apply_filter_full', 'umodes', 'vdm', 'u', 'f')};
 
         // Calculate minimum entropy from filtered solution
-        ${pyfr.expand('get_minima', 'u', 'm0', 'dmin', 'pmin', 'emin')};
+          ${pyfr.expand('get_minima', 'u', 'm0', 'dmin', 'pmin', 'emin', 'Rgas', 'ag', 'bg', 'cvg')};
         % endif
     }
 
