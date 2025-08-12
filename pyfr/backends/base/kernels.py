@@ -6,8 +6,8 @@ import numpy as np
 from pyfr.cache import memoize
 
 
-def fmt_float(f):
-    return f"{float(f):.17g}"
+def fmt_float(x):
+    return np.format_float_positional(float(x), precision=17, trim='-', unique=False)
 
 
 class Kernel:
@@ -72,11 +72,11 @@ class BasePointwiseKernelProvider(BaseKernelProvider):
     def _render_kernel(self, name, mod, extrns, tplargs):
         def coerce(v):
             if isinstance(v, (bool, np.bool_)):
-                return v
+                return bool(v)
             elif isinstance(v, (int, np.integer)):
-                return v
+                return int(v)
             elif isinstance(v, (float, np.floating)):
-                return f"{float(v):.17g}"
+                return float(v)
             elif isinstance(v, list):
                 return [coerce(i) for i in v]
             elif isinstance(v, tuple):
@@ -86,7 +86,7 @@ class BasePointwiseKernelProvider(BaseKernelProvider):
             else:
                 return v
 
-        tplargs = {k: coerce(v) for k, v in dict(tplargs).items()}
+        tplargs = dict(tplargs)
         tplargs['fmt'] = fmt_float
 
         # Backend-specfic generator classes
@@ -113,6 +113,9 @@ class BasePointwiseKernelProvider(BaseKernelProvider):
                     f'Real-gas acoustic kernel "{mod}" not implemented')
             else:
                 raise
+
+        tplargs = {k: coerce(v) for k, v in tplargs.items()}
+        argspecs = tplargs['_kernel_argspecs']
         src = tpl.render(**tplargs)
         src = re.sub(r'\n\n+', r'\n\n', src)
 
