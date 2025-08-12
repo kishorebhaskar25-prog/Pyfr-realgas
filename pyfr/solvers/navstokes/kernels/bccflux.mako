@@ -15,5 +15,6 @@
     fpdtype_t mag_nl = sqrt(${pyfr.dot('nl[{i}]', i=ndims)});
     fpdtype_t norm_nl[] = ${pyfr.array('(1 / mag_nl)*nl[{i}]', i=ndims)};
 
-    ${pyfr.expand('bc_common_flux_state', 'ul', 'gradul', 'artviscl', 'norm_nl', 'mag_nl')};
+    fpdtype_t Rgas = ${R}, ag = ${a}, bg = ${b}, cvg = ${cv};
+    ${pyfr.expand('bc_common_flux_state', 'ul', 'gradul', 'artviscl', 'norm_nl', 'mag_nl', 'Rgas', 'ag', 'bg', 'cvg')};
 </%pyfr:kernel>
