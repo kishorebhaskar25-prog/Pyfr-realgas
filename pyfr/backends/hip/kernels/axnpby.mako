@@ -1,5 +1,5 @@
-<%inherit file='base'/>
 <%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
+<%inherit file='base'/>
 
 __global__ __launch_bounds__(${block[0]*block[1]}) void
 axnpby(ixdtype_t ncolb, ixdtype_t ldim,

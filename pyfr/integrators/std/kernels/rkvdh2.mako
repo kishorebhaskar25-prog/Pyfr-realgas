@@ -1,5 +1,5 @@
-<%inherit file='base'/>
 <%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
+<%inherit file='base'/>
 
 <%pyfr:kernel name='rkvdh2' ndim='2'
               r1='inout fpdtype_t[${fmt(nvars)}]'

@@ -1,5 +1,5 @@
-<%inherit file='base'/>
 <%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
+<%inherit file='base'/>
 
 <%include file='pyfr.solvers.navstokes.kernels.bcs.${bctype}'/>
 <%include file='pyfr.solvers.euler.kernels.entropy'/>

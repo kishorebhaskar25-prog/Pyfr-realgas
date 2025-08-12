@@ -1,5 +1,5 @@
-<%inherit file='base'/>
 <%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
+<%inherit file='base'/>
 
 <%pyfr:kernel name='mpicent' ndim='1'
               entmin_lhs='inout view fpdtype_t'

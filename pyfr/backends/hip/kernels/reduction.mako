@@ -1,5 +1,5 @@
-<%inherit file='base'/>
 <%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
+<%inherit file='base'/>
 
 __global__ __launch_bounds__(${blocksz}) void
 reduction(ixdtype_t nrow, ixdtype_t ncolb, ixdtype_t ldim,

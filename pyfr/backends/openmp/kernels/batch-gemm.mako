@@ -1,3 +1,4 @@
+<%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
 <%inherit file='base'/>
 
 struct kargs

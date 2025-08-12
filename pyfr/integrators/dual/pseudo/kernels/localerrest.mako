@@ -1,5 +1,5 @@
-<%inherit file='base'/>
 <%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
+<%inherit file='base'/>
 
 <%pyfr:kernel name='localerrest' ndim='2'
               err='in fpdtype_t[${str(nvars)}]'

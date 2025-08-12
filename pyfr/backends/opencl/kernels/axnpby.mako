@@ -1,5 +1,5 @@
-<%inherit file='base'/>
 <%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
+<%inherit file='base'/>
 
 __kernel __attribute__((reqd_work_group_size(128, 1, 1))) void
 axnpby(ixdtype_t ncolb, ixdtype_t ldim,

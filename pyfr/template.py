@@ -31,6 +31,9 @@ class DottedTemplateLookup(TemplateLookup):
         # Subclass Template to support implicit arguments
         class DefaultTemplate(Template):
             def render(iself, *args, **kwargs):
+                kwargs.setdefault('_macros', {})
+                kwargs.setdefault('_extrns', {})
+                kwargs.setdefault('_kernel_generator', None)
                 return super().render(*args, **self.dfltargs, **kwargs)
 
         return DefaultTemplate(src, lookup=self)

@@ -44,3 +44,19 @@ ${x} ${x}
     src, ndim, argn, argt = provider._render_kernel('foo', 'foo', {}, tplargs)
 
     assert src.count('0.3333333333333333') == 2
+
+
+def test_render_kernel_helper_macro():
+    tplsrc = """
+<%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
+<%
+_kernel_argspecs['foo'] = (0, [], [])
+%>
+${pyfr.dot('a[{i}]', i=3)}
+"""
+    backend = DummyBackend(tplsrc)
+    provider = DummyProvider(backend)
+
+    src, *_ = provider._render_kernel('foo', 'foo', {}, {})
+
+    assert 'a[0]' in src and 'a[1]' in src and 'a[2]' in src
