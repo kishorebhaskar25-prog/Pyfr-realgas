@@ -42,6 +42,18 @@ class BaseInters:
         self._external_args = {}
         self._external_vals = {}
 
+    def _get_const(self, name, default=None):
+        if name in self.c:
+            return self.c[name]
+        try:
+            val = self.cfg.getfloat('constants', name, default)
+        except Exception as e:
+            raise ValueError(
+                f"Constant '{name}' missing or non-numeric in [constants]"
+            ) from e
+        self.c[name] = val
+        return val
+
     def _set_external(self, name, spec, value=None):
         self._external_args[name] = spec
 
