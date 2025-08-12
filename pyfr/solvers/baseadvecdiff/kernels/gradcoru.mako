@@ -8,11 +8,11 @@
 <% rcpdjac = 'rcpdjac_l' if 'linear' in ktype else 'rcpdjac' %>
 
 <%pyfr:kernel name='gradcoru' ndim='2'
-              gradu='inout fpdtype_t[${str(ndims)}][${str(nvars)}]'
-              smats='in fpdtype_t[${str(ndims)}][${str(ndims)}]'
+              gradu='inout fpdtype_t[${fmt(ndims)}][${fmt(nvars)}]'
+              smats='in fpdtype_t[${fmt(ndims)}][${fmt(ndims)}]'
               rcpdjac='in fpdtype_t'
-              verts='in broadcast-col fpdtype_t[${str(nverts)}][${str(ndims)}]'
-              upts='in broadcast-row fpdtype_t[${str(ndims)}]'>
+              verts='in broadcast-col fpdtype_t[${fmt(nverts)}][${fmt(ndims)}]'
+              upts='in broadcast-row fpdtype_t[${fmt(ndims)}]'>
 % if 'linear' in ktype:
     // Compute the S matrices
     fpdtype_t ${smats}[${ndims}][${ndims}], djac;

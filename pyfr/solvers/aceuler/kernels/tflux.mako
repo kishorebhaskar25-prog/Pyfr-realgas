@@ -6,11 +6,11 @@
 <% smats = 'smats_l' if 'linear' in ktype else 'smats' %>
 
 <%pyfr:kernel name='tflux' ndim='2'
-              u='in fpdtype_t[${str(nvars)}]'
-              f='out fpdtype_t[${str(ndims)}][${str(nvars)}]'
-              smats='in fpdtype_t[${str(ndims)}][${str(ndims)}]'
-              verts='in broadcast-col fpdtype_t[${str(nverts)}][${str(ndims)}]'
-              upts='in broadcast-row fpdtype_t[${str(ndims)}]'>
+              u='in fpdtype_t[${fmt(nvars)}]'
+              f='out fpdtype_t[${fmt(ndims)}][${fmt(nvars)}]'
+              smats='in fpdtype_t[${fmt(ndims)}][${fmt(ndims)}]'
+              verts='in broadcast-col fpdtype_t[${fmt(nverts)}][${fmt(ndims)}]'
+              upts='in broadcast-row fpdtype_t[${fmt(ndims)}]'>
 % if 'linear' in ktype:
     // Compute the S matrices
     fpdtype_t ${smats}[${ndims}][${ndims}], djac;

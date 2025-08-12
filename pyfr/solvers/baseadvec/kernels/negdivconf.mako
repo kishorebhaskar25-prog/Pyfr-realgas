@@ -6,9 +6,9 @@
 
 <%pyfr:kernel name='negdivconf' ndim='2'
               t='scalar fpdtype_t'
-              tdivtconf='inout fpdtype_t[${str(nvars)}]'
-              ploc='in fpdtype_t[${str(ndims)}]'
-              u='in fpdtype_t[${str(nvars)}]'
+              tdivtconf='inout fpdtype_t[${fmt(nvars)}]'
+              ploc='in fpdtype_t[${fmt(ndims)}]'
+              u='in fpdtype_t[${fmt(nvars)}]'
               rcpdjac='in fpdtype_t'>
 fpdtype_t src[${nvars}] = {};
 

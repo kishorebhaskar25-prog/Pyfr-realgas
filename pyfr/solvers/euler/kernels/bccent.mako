@@ -5,8 +5,8 @@
 <%include file='pyfr.solvers.euler.kernels.entropy'/>
 
 <%pyfr:kernel name='bccent' ndim='1'
-              ul='in view fpdtype_t[${str(nvars)}]'
-              nl='in fpdtype_t[${str(ndims)}]'
+              ul='in view fpdtype_t[${fmt(nvars)}]'
+              nl='in fpdtype_t[${fmt(ndims)}]'
               entmin_lhs='out view reduce(min) fpdtype_t'>
     fpdtype_t mag_nl = sqrt(${pyfr.dot('nl[{i}]', i=ndims)});
     fpdtype_t norm_nl[] = ${pyfr.array('(1 / mag_nl)*nl[{i}]', i=ndims)};

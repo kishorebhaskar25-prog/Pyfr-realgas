@@ -3,9 +3,9 @@
 <%include file='pyfr.solvers.euler.kernels.entropy'/>
 
 <%pyfr:kernel name='entropylocal' ndim='1'
-              u='in fpdtype_t[${str(nupts)}][${str(nvars)}]'
-              entmin_int='out fpdtype_t[${str(nfaces)}]'
-              m0='in broadcast fpdtype_t[${str(nfpts)}][${str(nupts)}]'>
+              u='in fpdtype_t[${fmt(nupts)}][${fmt(nvars)}]'
+              entmin_int='out fpdtype_t[${fmt(nfaces)}]'
+              m0='in broadcast fpdtype_t[${fmt(nfpts)}][${fmt(nupts)}]'>
     fpdtype_t Rgas = ${c['R']}, ag = ${c['a']}, bg = ${c['b']}, cvg = ${c['cv']};
 
     // Compute minimum entropy across element

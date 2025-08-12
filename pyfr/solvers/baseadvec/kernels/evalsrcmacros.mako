@@ -6,8 +6,8 @@
 
 <%pyfr:kernel name='evalsrcmacros' ndim='2'
               t='scalar fpdtype_t'
-              ploc='in fpdtype_t[${str(ndims)}]'
-              u='inout fpdtype_t[${str(nvars)}]'>
+              ploc='in fpdtype_t[${fmt(ndims)}]'
+              u='inout fpdtype_t[${fmt(nvars)}]'>
 fpdtype_t src[${nvars}] = {};
 
 % for mod, name in src_macros:
