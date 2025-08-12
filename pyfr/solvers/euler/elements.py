@@ -201,7 +201,8 @@ class EulerElements(BaseFluidElements, BaseAdvectionElements):
             'nvars': self.nvars,
             'nverts': len(self.basis.linspts),
             'c': self.cfg.items_as('constants', float),
-            'jac_exprs': self.basis.jac_exprs
+            'jac_exprs': self.basis.jac_exprs,
+            'R': rg.R, 'a': rg.A, 'b': rg.B, 'cv': rg.CV
         }
 
         # Helpers
