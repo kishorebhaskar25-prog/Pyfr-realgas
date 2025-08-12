@@ -74,7 +74,16 @@ class BasePointwiseKernelProvider(BaseKernelProvider):
             elif isinstance(v, (float, np.floating)):
                 return float(v)
             elif isinstance(v, (str, bytes, np.str_, np.bytes_)):
-                return str(v)
+                # Reject numeric values provided as strings/bytes.  These are
+                # typically intended to be constants or template parameters
+                # and should be supplied using a numeric type to avoid silent
+                # propagation into the template.
+                try:
+                    float(v)
+                except (TypeError, ValueError):
+                    return str(v)
+                else:
+                    raise TypeError('numeric value provided as string/bytes')
             elif isinstance(v, list):
                 return [coerce(i) for i in v]
             elif isinstance(v, tuple):
