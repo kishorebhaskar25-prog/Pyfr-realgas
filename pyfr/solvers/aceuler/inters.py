@@ -1,6 +1,7 @@
 from pyfr.solvers.baseadvec import (BaseAdvectionIntInters,
                                     BaseAdvectionMPIInters,
                                     BaseAdvectionBCInters)
+from pyfr.thermo import real_gas as rg
 
 
 class ACEulerIntInters(BaseAdvectionIntInters):
@@ -10,8 +11,15 @@ class ACEulerIntInters(BaseAdvectionIntInters):
         self._be.pointwise.register('pyfr.solvers.aceuler.kernels.intcflux')
 
         rsolver = self.cfg.get('solver-interfaces', 'riemann-solver')
+        for k, v in [('R', rg.R), ('a', rg.A), ('b', rg.B),
+                     ('cv', rg.CV), ('cp', rg.CV + rg.R),
+                     ('T', 0.0), ('pinf', 0.0)]:
+            self.c.setdefault(k, v)
+
         tplargs = dict(ndims=self.ndims, nvars=self.nvars, rsolver=rsolver,
-                       c=self.c)
+                       c=self.c, R=self.c['R'], a=self.c['a'],
+                       b=self.c['b'], cv=self.c['cv'], cp=self.c['cp'],
+                       T=self.c['T'], pinf=self.c['pinf'])
 
         self.kernels['comm_flux'] = lambda: self._be.kernel(
             'intcflux', tplargs=tplargs, dims=[self.ninterfpts],
@@ -26,8 +34,15 @@ class ACEulerMPIInters(BaseAdvectionMPIInters):
         self._be.pointwise.register('pyfr.solvers.aceuler.kernels.mpicflux')
 
         rsolver = self.cfg.get('solver-interfaces', 'riemann-solver')
+        for k, v in [('R', rg.R), ('a', rg.A), ('b', rg.B),
+                     ('cv', rg.CV), ('cp', rg.CV + rg.R),
+                     ('T', 0.0), ('pinf', 0.0)]:
+            self.c.setdefault(k, v)
+
         tplargs = dict(ndims=self.ndims, nvars=self.nvars, rsolver=rsolver,
-                       c=self.c)
+                       c=self.c, R=self.c['R'], a=self.c['a'],
+                       b=self.c['b'], cv=self.c['cv'], cp=self.c['cp'],
+                       T=self.c['T'], pinf=self.c['pinf'])
 
         self.kernels['comm_flux'] = lambda: self._be.kernel(
             'mpicflux', tplargs, dims=[self.ninterfpts],
@@ -42,8 +57,15 @@ class ACEulerBaseBCInters(BaseAdvectionBCInters):
         self._be.pointwise.register('pyfr.solvers.aceuler.kernels.bccflux')
 
         rsolver = self.cfg.get('solver-interfaces', 'riemann-solver')
+        for k, v in [('R', rg.R), ('a', rg.A), ('b', rg.B),
+                     ('cv', rg.CV), ('cp', rg.CV + rg.R),
+                     ('T', 0.0), ('pinf', 0.0)]:
+            self.c.setdefault(k, v)
+
         tplargs = dict(ndims=self.ndims, nvars=self.nvars, rsolver=rsolver,
-                       c=self.c, bctype=self.type)
+                       c=self.c, bctype=self.type, R=self.c['R'],
+                       a=self.c['a'], b=self.c['b'], cv=self.c['cv'],
+                       cp=self.c['cp'], T=self.c['T'], pinf=self.c['pinf'])
 
         self.kernels['comm_flux'] = lambda: self._be.kernel(
             'bccflux', tplargs=tplargs, dims=[self.ninterfpts],
