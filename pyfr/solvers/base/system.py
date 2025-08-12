@@ -32,7 +32,7 @@ class BaseSystem:
         privars = self.elementscls.privars(mesh.ndims, cfg)
 
         # Validate the constants block
-        for c in cfg.items('constants'):
+        for c in cfg.items_as('constants', float):
             if c in convars or c in privars:
                 raise ValueError(f'Invalid variable "{c}" in [constants]')
 

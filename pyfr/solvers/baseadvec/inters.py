@@ -154,7 +154,7 @@ class BaseAdvectionBCInters(BaseAdvectionIntersMixin, BaseInters):
     def _exp_opts(self, opts, lhs, default={}):
         cfg, sect = self.cfg, self.cfgsect
 
-        subs = cfg.items('constants')
+        subs = cfg.items_as('constants', float)
         subs |= dict(x='ploc[0]', y='ploc[1]', z='ploc[2]')
         subs |= dict(abs='fabs', pi=str(math.pi))
 
