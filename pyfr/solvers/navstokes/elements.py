@@ -67,7 +67,11 @@ class NavierStokesElements(BaseFluidElements, BaseAdvectionDiffusionElements):
             'c': c,
             'jac_exprs': self.basis.jac_exprs,
             'shock_capturing': shock_capturing,
-            'visc_corr': visc_corr
+            'visc_corr': visc_corr,
+            'R': c['R'],
+            'a': c['a'],
+            'b': c['b'],
+            'cv': c['cv']
         }
 
         # Helpers

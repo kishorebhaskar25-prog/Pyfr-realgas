@@ -31,8 +31,9 @@ class TplargsMixin:
         self._tplargs = dict(ndims=self.ndims, nvars=self.nvars,
                              rsolver=rsolver, visc_corr=visc_corr,
                              shock_capturing=shock_capturing, c=self.c,
-                             p_min=self.p_min, R=rg.R, a=rg.A,
-                             b=rg.B, cv=rg.CV)
+                             p_min=self.p_min, R=self.c['R'],
+                             a=self.c['a'], b=self.c['b'],
+                             cv=self.c['cv'])
 
 
 class NavierStokesIntInters(TplargsMixin,
