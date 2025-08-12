@@ -1,6 +1,7 @@
 import itertools as it
 import re
 import types
+import numpy as np
 
 from pyfr.cache import memoize
 
@@ -67,6 +68,11 @@ class BasePointwiseKernelProvider(BaseKernelProvider):
     def _render_kernel(self, name, mod, extrns, tplargs):
         # Copy the provided argument list
         tplargs = dict(tplargs)
+
+        # Convert numeric template arguments to full-precision strings
+        for k, v in list(tplargs.items()):
+            if isinstance(v, (int, float, np.floating)):
+                tplargs[k] = f"{float(v):.17g}"
 
         # Backend-specfic generator classes
         tplargs['_kernel_generator'] = self.kernel_generator_cls
