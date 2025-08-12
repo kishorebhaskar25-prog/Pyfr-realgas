@@ -3,7 +3,6 @@ import importlib.util as imu
 from pathlib import Path
 
 import numpy as np
-import pytest
 from mako.template import Template
 
 
@@ -87,7 +86,7 @@ ${a*b}
     assert '0.6666666666666666' in src
 
 
-def test_string_tplarg_rejected():
+def test_string_tplarg_accepted():
     tplsrc = """
 <%
 _kernel_argspecs['foo'] = (0, [], [])
@@ -98,11 +97,12 @@ ${x}
     backend = DummyBackend(tplsrc)
     provider = DummyProvider(backend)
 
-    with pytest.raises(TypeError):
-        provider._render_kernel('foo', 'foo', {}, {'x': '1'})
+    src, ndim, argn, argt = provider._render_kernel('foo', 'foo', {}, {'x': '1'})
+
+    assert '1' in src
 
 
-def test_bytes_tplarg_rejected():
+def test_bytes_tplarg_accepted():
     tplsrc = """
 <%
 _kernel_argspecs['foo'] = (0, [], [])
@@ -113,6 +113,26 @@ ${x}
     backend = DummyBackend(tplsrc)
     provider = DummyProvider(backend)
 
-    with pytest.raises(TypeError):
-        provider._render_kernel('foo', 'foo', {}, {'x': b'1'})
+    src, ndim, argn, argt = provider._render_kernel('foo', 'foo', {}, {'x': b'1'})
+
+    assert "b'1'" in src
+
+
+def test_string_list_tplarg_accepted():
+    tplsrc = """
+<%
+_kernel_argspecs['foo'] = (0, [], [])
+%>
+% for e in exprs:
+${e}
+% endfor
+"""
+
+    backend = DummyBackend(tplsrc)
+    provider = DummyProvider(backend)
+
+    tplargs = {'exprs': ['x + 1', 'y - 2']}
+    src, ndim, argn, argt = provider._render_kernel('foo', 'foo', {}, tplargs)
+
+    assert 'x + 1' in src and 'y - 2' in src
 

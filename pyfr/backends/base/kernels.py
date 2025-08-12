@@ -74,7 +74,7 @@ class BasePointwiseKernelProvider(BaseKernelProvider):
             elif isinstance(v, (float, np.floating)):
                 return float(v)
             elif isinstance(v, (str, bytes, np.str_, np.bytes_)):
-                raise TypeError('Kernel argument values must be numeric')
+                return str(v)
             elif isinstance(v, list):
                 return [coerce(i) for i in v]
             elif isinstance(v, tuple):
