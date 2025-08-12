@@ -9,6 +9,13 @@ def pressure(rho, T, R, a, b):
     return f'(({R}*{T})/(1.0/{rho} - {b}) - {a}/((1.0/{rho})*(1.0/{rho})))'
 %>
 
+<%
+# Ensure key thermodynamic constants are floats
+cpTref = float(c['cpTref'])
+cpTs = float(c['cpTs'])
+mu = float(c['mu'])
+%>
+
 % if ndims == 2:
 <%pyfr:macro name='viscous_flux_add' params='uin, grad_uin, fout, R, a, b, cv'>
     fpdtype_t rho = uin[0], rhou = uin[1], rhov = uin[2], E = uin[3];
@@ -36,11 +43,11 @@ def pressure(rho, T, R, a, b):
     // Viscosity (optionally via Sutherland's law)
     fpdtype_t cpT = (R + cv)*T;
 % if visc_corr == 'sutherland':
-    fpdtype_t Trat = cpT/${c['cpTref']};
-    fpdtype_t mu_c = ${c['mu']*(c['cpTref'] + c['cpTs'])}*Trat*sqrt(Trat)
-                   / (cpT + ${c['cpTs']});
+    fpdtype_t Trat = cpT/${cpTref};
+    fpdtype_t mu_c = ${mu*(cpTref + cpTs)}*Trat*sqrt(Trat)
+                   / (cpT + ${cpTs});
 % else:
-    fpdtype_t mu_c = ${c['mu']};
+    fpdtype_t mu_c = ${mu};
 % endif
 
     // Temperature derivatives (c_v*dT/d[x,y])
@@ -98,11 +105,11 @@ def pressure(rho, T, R, a, b):
     // Viscosity (optionally via Sutherland's law)
     fpdtype_t cpT = (R + cv)*T;
 % if visc_corr == 'sutherland':
-    fpdtype_t Trat = cpT/${c['cpTref']};
-    fpdtype_t mu_c = ${c['mu']*(c['cpTref'] + c['cpTs'])}*Trat*sqrt(Trat)
-                   / (cpT + ${c['cpTs']});
+    fpdtype_t Trat = cpT/${cpTref};
+    fpdtype_t mu_c = ${mu*(cpTref + cpTs)}*Trat*sqrt(Trat)
+                   / (cpT + ${cpTs});
 % else:
-    fpdtype_t mu_c = ${c['mu']};
+    fpdtype_t mu_c = ${mu};
 % endif
 
     // Compute temperature derivatives (c_v*dT/d[x,y,z])
