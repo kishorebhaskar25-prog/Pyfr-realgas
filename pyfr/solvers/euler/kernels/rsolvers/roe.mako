@@ -25,7 +25,12 @@
 % endfor
 
     fpdtype_t qq = ${pyfr.dot('va[{i}]', i=ndims)};
-    fpdtype_t a = sqrt(${c['gamma'] - 1}*(ha - 0.5*qq));
+    fpdtype_t h = ha - 0.5*qq;
+    fpdtype_t denom = ${c['cv']} + ${c['R']}/(1.0 - ${c['b']}*roa);
+    fpdtype_t Ta = (h + 2*${c['a']}*roa)/denom;
+    fpdtype_t ba = 1.0 - ${c['b']}*roa;
+    fpdtype_t a = sqrt(${c['R']}*Ta/(ba*ba) - 2*${c['a']}*roa
+                        - (${c['R']}*${c['R']}*Ta)/(${c['cv']}*ba*ba));
 
     // Compute the Eigenvalues
     fpdtype_t l1 = fabs(va[0] - a);

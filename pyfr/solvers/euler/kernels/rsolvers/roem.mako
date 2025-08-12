@@ -40,7 +40,12 @@
 
     fpdtype_t qq      = ${pyfr.dot('va[{i}]', 'va[{i}]', i=ndims)};
     fpdtype_t contraa = ${pyfr.dot('n[{i}]', 'va[{i}]', i=ndims)};
-    fpdtype_t aa      = sqrt(${c['gamma'] - 1}*(ha - 0.5*qq));
+    fpdtype_t h       = ha - 0.5*qq;
+    fpdtype_t denom   = ${c['cv']} + ${c['R']}/(1.0 - ${c['b']}*ra);
+    fpdtype_t Ta      = (h + 2*${c['a']}*ra)/denom;
+    fpdtype_t ba      = 1.0 - ${c['b']}*ra;
+    fpdtype_t aa      = sqrt(${c['R']}*Ta/(ba*ba) - 2*${c['a']}*ra
+                              - (${c['R']}*${c['R']}*Ta)/(${c['cv']}*ba*ba));
     fpdtype_t rcp_aa  = 1.0/aa;
 
     // Compute |M|, add a small number to avoid a possible singularity of f

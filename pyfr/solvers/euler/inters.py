@@ -4,6 +4,7 @@ from pyfr.solvers.baseadvec import (BaseAdvectionIntInters,
                                     BaseAdvectionMPIInters,
                                     BaseAdvectionBCInters)
 from pyfr.writers.csv import CSVStream
+from pyfr.thermo import real_gas as rg
 
 import numpy as np
 
@@ -32,6 +33,12 @@ class TplargsMixin:
         else:
             self.p_min = self.cfg.getfloat('solver-interfaces', 'p-min',
                                            5*self._be.fpdtype_eps)
+
+        # Ensure real-gas constants are available
+        self.c.setdefault('R', rg.R)
+        self.c.setdefault('a', rg.A)
+        self.c.setdefault('b', rg.B)
+        self.c.setdefault('cv', rg.CV)
 
         self._tplargs = dict(ndims=self.ndims, nvars=self.nvars,
                              rsolver=rsolver, c=self.c, p_min=self.p_min)

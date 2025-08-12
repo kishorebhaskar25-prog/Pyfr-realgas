@@ -1,7 +1,8 @@
 <%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
 <%include file='pyfr.solvers.euler.kernels.flux'/>
 
-<% gamma = c['gamma'] %>
+<% R = c['R']; a = c['a']; b = c['b']; cv = c['cv'] %>
+<% gamma = 1 + R/cv %>
 <% hgm = 0.5*(gamma - 1) %>
 <% grgm = gamma/(gamma - 1) %>
 <% trgm = 2/(gamma - 1) %>
@@ -30,18 +31,21 @@
 </%pyfr:macro>
 
 <%pyfr:macro name='primitives' params='s, p, v, c'>
-    fpdtype_t invrho = 1/s[0], E = s[${nvars - 1}];
+    fpdtype_t rho = s[0], invrho = 1/rho, E = s[${nvars - 1}];
 
     // Compute the velocities
 % for i in range(ndims):
     v[${i}] = invrho*s[${i + 1}];
 % endfor
 
-    // Compute the pressure
-    p = ${gamma - 1}*(E - 0.5*invrho*${pyfr.dot('s[{i}]', i=(1, ndims + 1))});
+    // Internal energy and temperature
+    fpdtype_t e = E - 0.5*invrho*${pyfr.dot('s[{i}]', 's[{i}]', i=(1, ndims + 1))};
+    fpdtype_t T = (e + a*rho)/cv;
+    fpdtype_t rb = 1.0 - b*rho;
 
-    // Compute the local sound speed
-    c = sqrt(${gamma}*p*invrho);
+    // Pressure and sound speed
+    p = R*T*rho/rb - a*rho*rho;
+    c = sqrt(R*T/(rb*rb) - 2*a*rho - (R*R*T)/(cv*rb*rb));
 </%pyfr:macro>
 
 <% kmax = 3 %>

@@ -16,8 +16,18 @@
     fpdtype_t nvl = ${pyfr.dot('n[{i}]', 'vl[{i}]', i=ndims)};
     fpdtype_t nvr = ${pyfr.dot('n[{i}]', 'vr[{i}]', i=ndims)};
 
-    fpdtype_t al = sqrt(${c['gamma']}*pl/ul[0]);
-    fpdtype_t ar = sqrt(${c['gamma']}*pr/ur[0]);
+    // Sound speeds of left and right states
+    fpdtype_t el = ul[${nvars - 1}] - 0.5*(1.0/ul[0])*${pyfr.dot('ul[{i + 1}]', 'ul[{i + 1}]', i=ndims)};
+    fpdtype_t Tl = (el + ${c['a']}*ul[0])/${c['cv']};
+    fpdtype_t bl = 1.0 - ${c['b']}*ul[0];
+    fpdtype_t al = sqrt(${c['R']}*Tl/(bl*bl) - 2*${c['a']}*ul[0]
+                         - (${c['R']}*${c['R']}*Tl)/(${c['cv']}*bl*bl));
+
+    fpdtype_t er = ur[${nvars - 1}] - 0.5*(1.0/ur[0])*${pyfr.dot('ur[{i + 1}]', 'ur[{i + 1}]', i=ndims)};
+    fpdtype_t Tr = (er + ${c['a']}*ur[0])/${c['cv']};
+    fpdtype_t br = 1.0 - ${c['b']}*ur[0];
+    fpdtype_t ar = sqrt(${c['R']}*Tr/(br*br) - 2*${c['a']}*ur[0]
+                         - (${c['R']}*${c['R']}*Tr)/(${c['cv']}*br*br));
 
     // Compute the Roe-averaged velocity
     fpdtype_t nv = (sqrt(ul[0])*nvl + sqrt(ur[0])*nvr)
@@ -36,7 +46,13 @@
     fpdtype_t qq = ${pyfr.dot('va[{i}]', i=ndims)};
     
     // Roe average speed of sound
-    fpdtype_t a = sqrt(${c['gamma'] - 1}*(H - 0.5*qq));
+    fpdtype_t h = H - 0.5*qq;
+    fpdtype_t rhoa = sqrt(ul[0])*sqrt(ur[0]);
+    fpdtype_t denom = ${c['cv']} + ${c['R']}/(1.0 - ${c['b']}*rhoa);
+    fpdtype_t Ta = (h + 2*${c['a']}*rhoa)/denom;
+    fpdtype_t ba = 1.0 - ${c['b']}*rhoa;
+    fpdtype_t a = sqrt(${c['R']}*Ta/(ba*ba) - 2*${c['a']}*rhoa
+                        - (${c['R']}*${c['R']}*Ta)/(${c['cv']}*ba*ba));
 
     // Estimate the left and right wave speed, sl and sr
     fpdtype_t sl = min(nv - a, nvl - al);
