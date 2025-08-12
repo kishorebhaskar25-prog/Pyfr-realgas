@@ -66,13 +66,23 @@ class BasePointwiseKernelProvider(BaseKernelProvider):
 
     @memoize
     def _render_kernel(self, name, mod, extrns, tplargs):
-        # Copy the provided argument list
-        tplargs = dict(tplargs)
+        def coerce(v):
+            if isinstance(v, (bool, np.bool_)):
+                return v
+            elif isinstance(v, (int, np.integer)):
+                return v
+            elif isinstance(v, (float, np.floating)):
+                return f"{float(v):.17g}"
+            elif isinstance(v, list):
+                return [coerce(i) for i in v]
+            elif isinstance(v, tuple):
+                return tuple(coerce(i) for i in v)
+            elif isinstance(v, dict):
+                return {k: coerce(val) for k, val in v.items()}
+            else:
+                return v
 
-        # Convert numeric template arguments to full-precision strings
-        for k, v in list(tplargs.items()):
-            if isinstance(v, (int, float, np.floating)):
-                tplargs[k] = f"{float(v):.17g}"
+        tplargs = {k: coerce(v) for k, v in dict(tplargs).items()}
 
         # Backend-specfic generator classes
         tplargs['_kernel_generator'] = self.kernel_generator_cls
