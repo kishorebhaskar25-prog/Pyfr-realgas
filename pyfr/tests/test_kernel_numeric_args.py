@@ -36,17 +36,18 @@ def test_float_coercion():
     tplsrc = """
 <%
 _kernel_argspecs['foo'] = (0, [], [])
+name = 'coef_' + fmt(x)
 %>
-${x}
+${name}
 """
 
     backend = DummyBackend(tplsrc)
     provider = DummyProvider(backend)
 
-    tplargs = {'x': np.float64(1/3)}
+    tplargs = {'x': np.float64(1 / 3)}
     src, ndim, argn, argt = provider._render_kernel('foo', 'foo', {}, tplargs)
 
-    assert '0.33333333333333331' in src
+    assert 'coef_0.33333333333333331' in src
 
 
 def test_integer_range_loop():
