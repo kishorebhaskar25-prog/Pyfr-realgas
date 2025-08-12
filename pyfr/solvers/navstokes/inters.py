@@ -6,6 +6,7 @@ from pyfr.solvers.baseadvecdiff import (BaseAdvectionDiffusionBCInters,
 from pyfr.solvers.euler.inters import (FluidIntIntersMixin,
                                        FluidMPIIntersMixin,
                                        MassFlowBCMixin)
+from pyfr.thermo import real_gas as rg
 
 
 class TplargsMixin:
@@ -21,6 +22,11 @@ class TplargsMixin:
         else:
             self.p_min = self.cfg.getfloat('solver-interfaces', 'p-min',
                                            5*self._be.fpdtype_eps)
+
+        self.c.setdefault('R', rg.R)
+        self.c.setdefault('a', rg.A)
+        self.c.setdefault('b', rg.B)
+        self.c.setdefault('cv', rg.CV)
 
         self._tplargs = dict(ndims=self.ndims, nvars=self.nvars,
                              rsolver=rsolver, visc_corr=visc_corr,
