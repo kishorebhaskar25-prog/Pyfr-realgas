@@ -1,4 +1,13 @@
 <%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
+<%!
+from pyfr.thermo import real_gas as rg
+
+def temperature(rho, e, cv, a):
+    return f'(({e} + {a}*{rho})/{cv})'
+
+def pressure(rho, T, R, a, b):
+    return f'(({R}*{T})/(1.0/{rho} - {b}) - {a}/((1.0/{rho})*(1.0/{rho})))'
+%>
 
 % if ndims == 2:
 <%pyfr:macro name='viscous_flux_add' params='uin, grad_uin, fout, R, a, b, cv'>
@@ -21,9 +30,8 @@
 
     // Internal energy, temperature and pressure
     fpdtype_t e = rcprho*E - 0.5*(u*u + v*v);
-    fpdtype_t T = (e + a*rho)/cv;
-    fpdtype_t vvol = rcprho;
-    fpdtype_t p = (R*T)/(vvol - b) - a/(vvol*vvol);
+    fpdtype_t T = ${temperature('rho', 'e', 'cv', 'a')};
+    fpdtype_t p = ${pressure('rho', 'T', 'R', 'a', 'b')};
 
     // Viscosity (optionally via Sutherland's law)
     fpdtype_t cpT = (R + cv)*T;
@@ -38,8 +46,8 @@
     // Temperature derivatives (c_v*dT/d[x,y])
     fpdtype_t e_x = rcprho*(E_x - (rcprho*rho_x*E + u*u_x + v*v_x));
     fpdtype_t e_y = rcprho*(E_y - (rcprho*rho_y*E + u*u_y + v*v_y));
-    fpdtype_t T_x = (e_x + a*rho_x)/cv;
-    fpdtype_t T_y = (e_y + a*rho_y)/cv;
+    fpdtype_t T_x = ${temperature('rho_x', 'e_x', 'cv', 'a')};
+    fpdtype_t T_y = ${temperature('rho_y', 'e_y', 'cv', 'a')};
 
     // Negated stress tensor elements
     fpdtype_t t_xx = -2*mu_c*rcprho*(u_x - ${1.0/3.0}*(u_x + v_y));
@@ -84,9 +92,8 @@
 
     // Internal energy, temperature and pressure
     fpdtype_t e = rcprho*E - 0.5*(u*u + v*v + w*w);
-    fpdtype_t T = (e + a*rho)/cv;
-    fpdtype_t vvol = rcprho;
-    fpdtype_t p = (R*T)/(vvol - b) - a/(vvol*vvol);
+    fpdtype_t T = ${temperature('rho', 'e', 'cv', 'a')};
+    fpdtype_t p = ${pressure('rho', 'T', 'R', 'a', 'b')};
 
     // Viscosity (optionally via Sutherland's law)
     fpdtype_t cpT = (R + cv)*T;
@@ -102,9 +109,9 @@
     fpdtype_t e_x = rcprho*(E_x - (rcprho*rho_x*E + u*u_x + v*v_x + w*w_x));
     fpdtype_t e_y = rcprho*(E_y - (rcprho*rho_y*E + u*u_y + v*v_y + w*w_y));
     fpdtype_t e_z = rcprho*(E_z - (rcprho*rho_z*E + u*u_z + v*v_z + w*w_z));
-    fpdtype_t T_x = (e_x + a*rho_x)/cv;
-    fpdtype_t T_y = (e_y + a*rho_y)/cv;
-    fpdtype_t T_z = (e_z + a*rho_z)/cv;
+    fpdtype_t T_x = ${temperature('rho_x', 'e_x', 'cv', 'a')};
+    fpdtype_t T_y = ${temperature('rho_y', 'e_y', 'cv', 'a')};
+    fpdtype_t T_z = ${temperature('rho_z', 'e_z', 'cv', 'a')};
 
     // Negated stress tensor elements
     fpdtype_t t_xx = -2*mu_c*rcprho*(u_x - ${1.0/3.0}*(u_x + v_y + w_z));

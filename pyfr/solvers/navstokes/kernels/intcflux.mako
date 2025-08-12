@@ -22,7 +22,7 @@
     fpdtype_t ficomm[${nvars}], fvcomm;
     ${pyfr.expand('rsolve', 'ul', 'ur', 'norm_nl', 'ficomm')};
 
-    fpdtype_t Rgas = ${c['R']}, ag = ${c['a']}, bg = ${c['b']}, cvg = ${c['cv']};
+    fpdtype_t Rgas = ${R}, ag = ${a}, bg = ${b}, cvg = ${cv};
 
 % if beta != -0.5:
     fpdtype_t fvl[${ndims}][${nvars}] = {{0}};
