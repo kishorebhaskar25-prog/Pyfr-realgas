@@ -7,7 +7,7 @@
     fpdtype_t vl[${ndims}], vr[${ndims}];
     fpdtype_t pl, pr, cl, cr;
 
-    fpdtype_t Rgas = ${c['R']}, ag = ${c['a']}, bg = ${c['b']}, cvg = ${c['cv']};
+    fpdtype_t Rgas = ${R}, ag = ${a}, bg = ${b}, cvg = ${cv};
 
     ${pyfr.expand('inviscid_flux', 'ul', 'fl', 'pl', 'cl', 'vl', 'Rgas', 'ag', 'bg', 'cvg')};
     ${pyfr.expand('inviscid_flux', 'ur', 'fr', 'pr', 'cr', 'vr', 'Rgas', 'ag', 'bg', 'cvg')};

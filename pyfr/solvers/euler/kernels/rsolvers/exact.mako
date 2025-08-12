@@ -30,18 +30,27 @@
 </%pyfr:macro>
 
 <%pyfr:macro name='primitives' params='s, p, v, c'>
-    fpdtype_t invrho = 1/s[0], E = s[${nvars - 1}];
+    fpdtype_t rho = s[0], invrho = 1.0/rho, E = s[${nvars - 1}];
 
     // Compute the velocities
 % for i in range(ndims):
     v[${i}] = invrho*s[${i + 1}];
 % endfor
 
+    fpdtype_t Rgas = ${R}, ag = ${a}, bg = ${b}, cvg = ${cv};
+
+    // Internal energy and temperature
+    fpdtype_t e = E - 0.5*invrho*${pyfr.dot('s[{i}]', i=(1, ndims + 1))};
+    fpdtype_t T = (e + ag*rho)/cvg;
+
     // Compute the pressure
-    p = ${gamma - 1}*(E - 0.5*invrho*${pyfr.dot('s[{i}]', i=(1, ndims + 1))});
+    fpdtype_t vvol = invrho;
+    p = (Rgas*T)/(vvol - bg) - ag/(vvol*vvol);
 
     // Compute the local sound speed
-    c = sqrt(${gamma}*p*invrho);
+    fpdtype_t ombr = 1.0 - bg*rho;
+    fpdtype_t csq = (Rgas*T/(ombr*ombr))*(1.0 + Rgas/cvg) - 2.0*ag*rho;
+    c = sqrt(csq);
 </%pyfr:macro>
 
 <% kmax = 3 %>
@@ -51,6 +60,8 @@
     fpdtype_t vr[${ndims}], pr, cr, fsr, fdr;
     fpdtype_t p0, p1;
     fpdtype_t w0[${nvars}];
+
+    fpdtype_t Rgas = ${R}, ag = ${a}, bg = ${b}, cvg = ${cv};
 
     // Compute the left/right primitives
     ${pyfr.expand('primitives', 'ul', 'pl', 'vl', 'cl')};
@@ -201,8 +212,12 @@
 % for i in range(2, ndims + 1):
     nf[${i}] = nf[0]*w0[${i}];
 % endfor
-    nf[${nvars - 1}] = (${grgm}*w0[${nvars - 1}] +
-                        0.5*w0[0]*(${pyfr.dot('w0[{i}]', i=(1, ndims + 1))}))*w0[1];
+    fpdtype_t v0 = 1.0/w0[0];
+    fpdtype_t T0 = (w0[${nvars - 1}] + ag/(v0*v0))*(v0 - bg)/Rgas;
+    fpdtype_t e0 = cvg*T0 - ag*w0[0];
+    fpdtype_t h0 = e0 + w0[${nvars - 1}]*v0;
+    fpdtype_t vsq = ${pyfr.dot('w0[{i}]', i=(1, ndims + 1))};
+    nf[${nvars - 1}] = w0[0]*w0[1]*(h0 + 0.5*vsq);
 
 </%pyfr:macro>
 
