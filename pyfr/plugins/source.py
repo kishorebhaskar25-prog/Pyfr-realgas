@@ -16,7 +16,7 @@ class SourcePlugin(BaseSolverPlugin):
 
         convars = first(intg.system.ele_map.values()).convars
 
-        subs = self.cfg.items('constants')
+        subs = self.cfg.items_as('constants', float)
         subs |= dict(x='ploc[0]', y='ploc[1]', z='ploc[2]')
         subs |= dict(abs='fabs', pi=math.pi)
         subs |= {v: f'u[{i}]' for i, v in enumerate(convars)}
