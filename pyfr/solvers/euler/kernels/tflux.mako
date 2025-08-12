@@ -17,7 +17,7 @@
     ${pyfr.expand('calc_smats_detj', 'verts', 'upts', smats, 'djac')};
 % endif
 
-    // Compute the flux
+    // Compute the flux using the real-gas equation of state
     fpdtype_t ftemp[${ndims}][${nvars}];
     fpdtype_t p, c, v[${ndims}];
     fpdtype_t Rgas = ${c['R']}, ag = ${c['a']}, bg = ${c['b']}, cvg = ${c['cv']};

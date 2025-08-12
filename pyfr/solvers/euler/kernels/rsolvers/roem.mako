@@ -2,17 +2,15 @@
 <%include file='pyfr.solvers.euler.kernels.flux'/>
 
 // RoeM scheme (ref: JCP 185(2), 342-374)
-<%pyfr:macro name='rsolve' params='ul, ur, n, nf'>
+<%pyfr:macro name='rsolve' params='ul, ur, n, nf, R=${R}, a=${a}, b=${b}, cv=${cv}'>
     // Compute the left and right fluxes + velocities, pressures and sounds
     fpdtype_t fl[${ndims}][${nvars}], fr[${ndims}][${nvars}];
     fpdtype_t vl[${ndims}], vr[${ndims}], va[${ndims}], dv[${ndims}];
     fpdtype_t du[${nvars}], bdq[${nvars}];
     fpdtype_t pl, pr, al, ar;
 
-    fpdtype_t Rgas = ${R}, ag = ${a}, bg = ${b}, cvg = ${cv};
-
-    ${pyfr.expand('inviscid_flux', 'ul', 'fl', 'pl', 'al', 'vl', 'Rgas', 'ag', 'bg', 'cvg')};
-    ${pyfr.expand('inviscid_flux', 'ur', 'fr', 'pr', 'ar', 'vr', 'Rgas', 'ag', 'bg', 'cvg')};
+    ${pyfr.expand('inviscid_flux', 'ul', 'fl', 'pl', 'al', 'vl', 'R', 'a', 'b', 'cv')};
+    ${pyfr.expand('inviscid_flux', 'ur', 'fr', 'pr', 'ar', 'vr', 'R', 'a', 'b', 'cv')};
 
     // Specific enthalpy, contra velocity for left / right
     fpdtype_t hl = (ul[${ndims + 1}] + pl)/ul[0];
