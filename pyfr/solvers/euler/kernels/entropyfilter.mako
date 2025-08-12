@@ -115,7 +115,7 @@
 
         // Apply density, pressure, and entropy limiting sequentially
         fpdtype_t alpha;
-        % for (fvar, bound) in [('d', d_min), ('p', p_min), ('e', f'entmin - {fmt(e_tol)}')]:
+        % for (fvar, bound) in [('d', d_min), ('p', p_min), ('e', f'entmin - {e_tol}')]:
         if (${fvar}min < ${bound}) 
         {
             alpha = (${fvar}min - (${bound}))/(${fvar}min - ${fvar}avg);
