@@ -1,5 +1,6 @@
 from collections.abc import Iterable
 import itertools as it
+import numbers
 import re
 
 from mako.runtime import supports_caller, capture
@@ -10,10 +11,29 @@ import pyfr.util as util
 
 
 def ndrange(context, *args):
+    for arg in args:
+        if isinstance(arg, Iterable):
+            if not all(isinstance(a, numbers.Integral) for a in arg):
+                raise TypeError(
+                    'ndrange expects iterable of integers, got '
+                    f'{arg}'
+                )
+        elif not isinstance(arg, numbers.Integral):
+            raise TypeError(
+                'ndrange expects integer arguments, got '
+                f'{type(arg).__name__}'
+            )
+
     return util.ndrange(*args)
 
 
 def ilog2range(context, x):
+    if not isinstance(x, numbers.Integral):
+        raise TypeError(
+            'ilog2range expects an integer, got '
+            f'{type(x).__name__}'
+        )
+
     return [2**i for i in range(x.bit_length() - 2, -1, -1)]
 
 
@@ -27,6 +47,11 @@ def dot(context, a_, b_=None, /, **kwargs):
 
     # Allow for flexible range arguments
     nd = nd if isinstance(nd, Iterable) else [nd]
+    if not all(isinstance(n, numbers.Integral) for n in nd):
+        raise TypeError(
+            'dot macro expects integer range bounds, got '
+            f'{nd}'
+        )
 
     return '(' + ' + '.join(ab.format(**{ix: i}) for i in range(*nd)) + ')'
 
@@ -37,7 +62,22 @@ def array(context, expr_, vals_={}, /, **kwargs):
     items = []
 
     # Allow for flexible range arguments
-    for i in range(*(ni if isinstance(ni, Iterable) else [ni])):
+    if isinstance(ni, Iterable):
+        if not all(isinstance(n, numbers.Integral) for n in ni):
+            raise TypeError(
+                'array macro expects integer range values for '
+                f'{ix}, got {ni}'
+            )
+        rng = ni
+    elif isinstance(ni, numbers.Integral):
+        rng = [ni]
+    else:
+        raise TypeError(
+            'array macro expects integer or iterable range for '
+            f'{ix}, got {type(ni).__name__}'
+        )
+
+    for i in range(*rng):
         if kwargs:
             items.append(array(context, expr_, vals_ | {ix: i}, **kwargs))
         else:
@@ -47,6 +87,19 @@ def array(context, expr_, vals_={}, /, **kwargs):
 
 
 def polyfit(context, f, a, b, n, var, nqpts=500):
+    for val, name in [(a, 'a'), (b, 'b')]:
+        if not isinstance(val, numbers.Real):
+            raise TypeError(
+                f'polyfit: {name} must be a real number, got '
+                f'{type(val).__name__}'
+            )
+    for val, name in [(n, 'n'), (nqpts, 'nqpts')]:
+        if not isinstance(val, numbers.Integral):
+            raise TypeError(
+                f'polyfit: {name} must be an integer, got '
+                f'{type(val).__name__}'
+            )
+
     x = np.linspace(a, b, nqpts)
     y = f(x)
 
