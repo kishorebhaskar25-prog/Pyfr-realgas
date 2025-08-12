@@ -1,5 +1,5 @@
-<%inherit file='base'/>
 <%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
+<%inherit file='base'/>
 
 kernel void
 axnpby(constant ixdtype_t& ncolb, constant ixdtype_t& ldim,

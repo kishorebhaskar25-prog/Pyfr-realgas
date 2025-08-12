@@ -1,5 +1,5 @@
-<%inherit file='base'/>
 <%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
+<%inherit file='base'/>
 
 <% se0 = math.log10(c['s0']/order**4) %>
 

@@ -1,5 +1,5 @@
-<%inherit file='base'/>
 <%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
+<%inherit file='base'/>
 
 kernel void
 reduction(constant ixdtype_t& nrow, constant ixdtype_t& ncolb,

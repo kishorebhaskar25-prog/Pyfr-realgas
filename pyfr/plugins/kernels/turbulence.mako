@@ -1,6 +1,6 @@
+<%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
 <% import numpy as np %>
 
-<%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
 
 <%pyfr:macro name='turbulence' params='t, u, ploc, src' externs='tinit, state'>
   fpdtype_t arg, clip, g;

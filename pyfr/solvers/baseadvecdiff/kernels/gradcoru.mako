@@ -1,5 +1,5 @@
-<%inherit file='base'/>
 <%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
+<%inherit file='base'/>
 
 <%include file='pyfr.solvers.baseadvec.kernels.smats'/>
 <%include file='pyfr.solvers.baseadvecdiff.kernels.transform_grad'/>

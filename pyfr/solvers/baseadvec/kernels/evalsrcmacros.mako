@@ -1,5 +1,5 @@
-<%inherit file='base'/>
 <%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
+<%inherit file='base'/>
 % for mod, name in src_macros:
     <%include file='${mod}'/>
 % endfor

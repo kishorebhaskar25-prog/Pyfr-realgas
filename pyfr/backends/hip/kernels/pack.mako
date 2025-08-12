@@ -1,3 +1,4 @@
+<%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
 <%inherit file='base'/>
 
 __global__ __launch_bounds__(${blocksz}) void
