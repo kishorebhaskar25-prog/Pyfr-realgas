@@ -233,7 +233,7 @@ class BaseKernelGenerator:
     def _render_body(self, body):
         # At single precision suffix all floating point constants by 'f'
         if self.fpdtype == np.float32:
-            body = re.sub(r'(?=\d*[.eE])(?=\.?\d)\d*\.?\d*(?:[eE][+-]?\d+)?',
+            body = re.sub(r'(?=\d*[.eE])(?=\.?\d)\d*\.?\d*(?:[eE][+-]?\d+)?(?![A-Za-z_])',
                           r'\g<0>f', body)
 
         # Dereference vector arguments
@@ -372,7 +372,10 @@ class BaseGPUKernelGenerator(BaseKernelGenerator):
         if preamble:
             preamble.append(f'{self._shared_sync};')
 
-        return self._render_body(body), '\n'.join(preamble)
+        rendered_body = self._render_body(body)
+        rendered_preamble = self._render_body('\n'.join(preamble)) if preamble else ''
+
+        return rendered_body, rendered_preamble
 
     def render(self):
         spec = self._render_spec()

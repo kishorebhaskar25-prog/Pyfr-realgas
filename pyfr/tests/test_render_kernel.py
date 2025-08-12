@@ -94,3 +94,27 @@ ${pyfr.expand('coeff', np.int32(2), np.float64(1/3))}
 
     assert 'idx = 2;' in src
     assert 'val = 0.3333333333333333;' in src
+
+
+def test_single_precision_literal_suffix():
+    generator_path = Path(__file__).resolve().parents[1] / 'backends' / 'base' / 'generator.py'
+    loader = imm.SourceFileLoader('generator_stub', str(generator_path))
+    spec = imu.spec_from_loader(loader.name, loader)
+    generator_mod = imu.module_from_spec(spec)
+    loader.exec_module(generator_mod)
+    BaseKernelGenerator = generator_mod.BaseKernelGenerator
+
+    g = BaseKernelGenerator('foo', 1, {}, 'fpdtype_t a = 1.0;', np.float32, np.int32)
+    assert '1.0f' in g.body
+
+
+def test_double_precision_literal_suffix():
+    generator_path = Path(__file__).resolve().parents[1] / 'backends' / 'base' / 'generator.py'
+    loader = imm.SourceFileLoader('generator_stub', str(generator_path))
+    spec = imu.spec_from_loader(loader.name, loader)
+    generator_mod = imu.module_from_spec(spec)
+    loader.exec_module(generator_mod)
+    BaseKernelGenerator = generator_mod.BaseKernelGenerator
+
+    g = BaseKernelGenerator('foo', 1, {}, 'fpdtype_t a = 1.0;', np.float64, np.int32)
+    assert '1.0f' not in g.body
