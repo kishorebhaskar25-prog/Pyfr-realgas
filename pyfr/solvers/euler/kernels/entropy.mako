@@ -13,7 +13,8 @@
     fpdtype_t vvol = rcpd;
     p = (R*T)/(vvol - b) - a/(vvol*vvol);
 
-    // Compute entropy
-    fpdtype_t gamma = 1.0 + R/cv;
-    e = (d > 0 && p > 0) ? p*pow(rcpd, gamma) : ${fpdtype_max};
+    // Compute entropy using the Van der Waals relation
+    e = (d > 0 && p > 0)
+        ? (cv*log(T) + R*log(vvol - b))
+        : ${fpdtype_max};
 </%pyfr:macro>
