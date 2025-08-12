@@ -1,11 +1,17 @@
 <%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
 
-<% gmo = c['gamma'] - 1.0 %>
-<% gamma = c['gamma'] %>
+<% gamma = 1.0 + c['R']/c['cv'] %>
+<% gmo = gamma - 1.0 %>
 
 <%pyfr:macro name='bc_rsolve_state' params='ul, nl, ur' externs='ploc, t'>
-    fpdtype_t cs = sqrt(${gamma}*${c['p']}/${c['rho']});
-    fpdtype_t s = ${c['p']}*pow(${c['rho']}, -${gamma});
+    fpdtype_t rhoe = ${c['rho']};
+    fpdtype_t p0 = ${c['p']};
+    fpdtype_t one_m_br = 1.0 - ${c['b']}*rhoe;
+    fpdtype_t Te = (p0 + ${c['a']}*rhoe*rhoe)*one_m_br/(${c['R']}*rhoe);
+    fpdtype_t cs = sqrt(${c['R']}*Te*(1.0 + ${c['R']}/${c['cv']})/(one_m_br*one_m_br)
+                      - 2*${c['a']}*rhoe);
+    fpdtype_t s = (p0 + ${c['a']}*rhoe*rhoe)*pow(rhoe, -${gamma})
+                  *pow(one_m_br, ${gamma});
     fpdtype_t ratio = cs*${2.0/gmo};
 
     fpdtype_t inv = 1.0/ul[0];
@@ -13,9 +19,14 @@
                                  for i in range(ndims))};
     fpdtype_t V_i = inv*(${' + '.join('ul[{1}]*nl[{0}]'.format(i, i + 1)
                                       for i in range(ndims))});
-    fpdtype_t p_i = ${gmo}*ul[${nvars - 1}]
-                  - ${0.5*gmo}*inv*${pyfr.dot('ul[{i}]', i=(1, ndims + 1))};
-    fpdtype_t c_i = sqrt(${gamma}*p_i*inv);
+    fpdtype_t e_i = ul[${nvars - 1}]
+                  - 0.5*inv*${pyfr.dot('ul[{i}]', i=(1, ndims + 1))};
+    fpdtype_t T_i = (e_i*inv + ${c['a']}*ul[0])/${c['cv']};
+    fpdtype_t p_i = ${c['R']}*T_i*ul[0]/(1.0 - ${c['b']}*ul[0])
+                  - ${c['a']}*ul[0]*ul[0];
+    fpdtype_t c_i = sqrt(${c['R']}*T_i*(1.0 + ${c['R']}/${c['cv']})/
+                          ((1.0 - ${c['b']}*ul[0])*(1.0 - ${c['b']}*ul[0]))
+                          - 2*${c['a']}*ul[0]);
     fpdtype_t R_e = (fabs(V_e) >= cs && V_i >= 0)
                   ? V_i - c_i*${2.0/gmo}
                   : V_e - ratio;
@@ -27,7 +38,8 @@
     fpdtype_t rho_b = (V_i < 0)
                     ? pow((1.0/(${gamma}*s))*c_b*c_b, ${1.0/gmo})
                     : ul[0]*pow(ul[0]*c_b*c_b/(${gamma}*p_i), ${1.0/gmo});
-    fpdtype_t p_b = ${1.0/gamma}*rho_b*c_b*c_b;
+    fpdtype_t p_b = ${c['R']}*Te*pow(rho_b/rhoe, ${gamma})/(1.0 - ${c['b']}*rho_b)
+                   - ${c['a']}*rho_b*rho_b;
 
     ur[0] = rho_b;
 % for i in range(ndims):

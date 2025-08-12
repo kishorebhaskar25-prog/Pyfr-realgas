@@ -6,6 +6,7 @@ from pyfr.solvers.baseadvecdiff import (BaseAdvectionDiffusionBCInters,
 from pyfr.solvers.euler.inters import (FluidIntIntersMixin,
                                        FluidMPIIntersMixin,
                                        MassFlowBCMixin)
+from pyfr.thermo import real_gas as rg
 
 
 class TplargsMixin:
@@ -78,6 +79,11 @@ class NavierStokesBaseBCInters(TplargsMixin, BaseAdvectionDiffusionBCInters):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.c.setdefault('R', rg.R)
+        self.c.setdefault('a', rg.A)
+        self.c.setdefault('b', rg.B)
+        self.c.setdefault('cv', rg.CV)
 
         # Additional BC specific template arguments
         self._tplargs['bctype'] = self.type
@@ -182,12 +188,13 @@ class NavierStokesSubInflowFtpttangBCInters(NavierStokesBaseBCInters):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        gamma = self.cfg.getfloat('constants', 'gamma')
+        R = self.c.setdefault('R', rg.R)
+        cv = self.c.setdefault('cv', rg.CV)
 
         # Pass boundary constants to the backend
         self.c['cpTt'], = self._eval_opts(['cpTt'])
         self.c['pt'], = self._eval_opts(['pt'])
-        self.c['Rdcp'] = (gamma - 1.0)/gamma
+        self.c['Rdcp'] = R/(cv + R)
 
         # Calculate u, v velocity components from the inflow angle
         theta = self._eval_opts(['theta'])[0]*np.pi/180.0

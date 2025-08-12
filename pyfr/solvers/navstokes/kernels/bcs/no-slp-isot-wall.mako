@@ -6,7 +6,9 @@
 % for i, v in enumerate('uvw'[:ndims]):
     ur[${i + 1}] = -ul[${i + 1}] + 2*${c[v]}*ul[0];
 % endfor
-    ur[${nvars - 1}] = ${c['cpTw']/c['gamma']}*ur[0]
+    fpdtype_t e = (${c['cpTw']}*${c['cv']}/(${c['cv']}+${c['R']})
+                  - ${c['a']}*ur[0])*ur[0];
+    ur[${nvars - 1}] = e
                      + 0.5*(1.0/ur[0])*${pyfr.dot('ur[{i}]', i=(1, ndims + 1))};
 </%pyfr:macro>
 
@@ -15,7 +17,9 @@
 % for i, v in enumerate('uvw'[:ndims]):
     ur[${i + 1}] = ${c[v]}*ul[0];
 % endfor
-    ur[${nvars - 1}] = ${c['cpTw']/c['gamma']}*ur[0]
+    fpdtype_t e = (${c['cpTw']}*${c['cv']}/(${c['cv']}+${c['R']})
+                  - ${c['a']}*ur[0])*ur[0];
+    ur[${nvars - 1}] = e
                      + 0.5*(1.0/ur[0])*${pyfr.dot('ur[{i}]', i=(1, ndims + 1))};
 </%pyfr:macro>
 

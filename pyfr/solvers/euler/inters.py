@@ -4,6 +4,7 @@ from pyfr.solvers.baseadvec import (BaseAdvectionIntInters,
                                     BaseAdvectionMPIInters,
                                     BaseAdvectionBCInters)
 from pyfr.writers.csv import CSVStream
+from pyfr.thermo import real_gas as rg
 
 import numpy as np
 
@@ -79,6 +80,11 @@ class EulerMPIInters(TplargsMixin, FluidMPIIntersMixin,
 class EulerBaseBCInters(TplargsMixin, BaseAdvectionBCInters):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.c.setdefault('R', rg.R)
+        self.c.setdefault('a', rg.A)
+        self.c.setdefault('b', rg.B)
+        self.c.setdefault('cv', rg.CV)
 
         self._be.pointwise.register('pyfr.solvers.euler.kernels.bccflux')
 
