@@ -19,7 +19,7 @@
 
     // Compute the flux
     fpdtype_t ftemp[${ndims}][${nvars}];
-    ${pyfr.expand('inviscid_flux', 'u', 'ftemp', 'R', 'a', 'b', 'T', 'pinf')};
+    ${pyfr.expand('inviscid_flux', 'u', 'ftemp', 'R', 'a', 'b', 'cv', 'T', 'pinf')};
 
     // Transform the fluxes
 % for i, j in pyfr.ndrange(ndims, nvars):
