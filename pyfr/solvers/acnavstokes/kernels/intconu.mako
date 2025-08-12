@@ -2,10 +2,10 @@
 <%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
 
 <%pyfr:kernel name='intconu' ndim='1'
-              ulin='in view fpdtype_t[${str(nvars)}]'
-              urin='in view fpdtype_t[${str(nvars)}]'
-              ulout='out view fpdtype_t[${str(nvars)}]'
-              urout='out view fpdtype_t[${str(nvars)}]'>
+              ulin='in view fpdtype_t[${fmt(nvars)}]'
+              urin='in view fpdtype_t[${fmt(nvars)}]'
+              ulout='out view fpdtype_t[${fmt(nvars)}]'
+              urout='out view fpdtype_t[${fmt(nvars)}]'>
 % for i in range(nvars):
 % if c['ldg-beta'] == -0.5:
     urout[${i}] = ulin[${i}];

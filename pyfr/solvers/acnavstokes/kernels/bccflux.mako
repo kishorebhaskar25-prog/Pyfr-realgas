@@ -8,9 +8,9 @@
 % endif
 
 <%pyfr:kernel name='bccflux' ndim='1'
-              ul='inout view fpdtype_t[${str(nvars)}]'
-              gradul='in view fpdtype_t[${str(ndims)}][${str(nvars)}]'
-              nl='in fpdtype_t[${str(ndims)}]'>
+              ul='inout view fpdtype_t[${fmt(nvars)}]'
+              gradul='in view fpdtype_t[${fmt(ndims)}][${fmt(nvars)}]'
+              nl='in fpdtype_t[${fmt(ndims)}]'>
     fpdtype_t mag_nl = sqrt(${pyfr.dot('nl[{i}]', i=ndims)});
     fpdtype_t norm_nl[] = ${pyfr.array('(1 / mag_nl)*nl[{i}]', i=ndims)};
 

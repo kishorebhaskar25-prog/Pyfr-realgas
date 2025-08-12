@@ -2,10 +2,10 @@
 <%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
 
 <%pyfr:kernel name='rkvdh2' ndim='2'
-              r1='inout fpdtype_t[${str(nvars)}]'
-              r2='inout fpdtype_t[${str(nvars)}]'
-              rold='out fpdtype_t[${str(nvars)}]'
-              rerr='inout fpdtype_t[${str(nvars)}]'
+              r1='inout fpdtype_t[${fmt(nvars)}]'
+              r2='inout fpdtype_t[${fmt(nvars)}]'
+              rold='out fpdtype_t[${fmt(nvars)}]'
+              rerr='inout fpdtype_t[${fmt(nvars)}]'
               dt='scalar fpdtype_t'>
     fpdtype_t tmpr1[] = ${pyfr.array('r1[{j}]', j=nvars)};
     fpdtype_t tmpr2[] = ${pyfr.array('r2[{j}]', j=nvars)};

@@ -4,7 +4,7 @@
 <% se0 = math.log10(c['s0']/order**4) %>
 
 <%pyfr:kernel name='shocksensor' ndim='1'
-              u='in fpdtype_t[${str(nupts)}][${str(nvars)}]'
+              u='in fpdtype_t[${fmt(nupts)}][${fmt(nvars)}]'
               artvisc='out fpdtype_t'>
     // Smoothness indicator
     fpdtype_t totEn = 0.0, pnEn = 1e-15, tmp;

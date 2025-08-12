@@ -8,13 +8,13 @@
 <% beta, tau = c['ldg-beta'], c['ldg-tau'] %>
 
 <%pyfr:kernel name='intcflux' ndim='1'
-              ul='inout view fpdtype_t[${str(nvars)}]'
-              ur='inout view fpdtype_t[${str(nvars)}]'
-              gradul='in view fpdtype_t[${str(ndims)}][${str(nvars)}]'
-              gradur='in view fpdtype_t[${str(ndims)}][${str(nvars)}]'
+              ul='inout view fpdtype_t[${fmt(nvars)}]'
+              ur='inout view fpdtype_t[${fmt(nvars)}]'
+              gradul='in view fpdtype_t[${fmt(ndims)}][${fmt(nvars)}]'
+              gradur='in view fpdtype_t[${fmt(ndims)}][${fmt(nvars)}]'
               artviscl='in view fpdtype_t'
               artviscr='in view fpdtype_t'
-              nl='in fpdtype_t[${str(ndims)}]'>
+              nl='in fpdtype_t[${fmt(ndims)}]'>
     fpdtype_t mag_nl = sqrt(${pyfr.dot('nl[{i}]', i=ndims)});
     fpdtype_t norm_nl[] = ${pyfr.array('(1 / mag_nl)*nl[{i}]', i=ndims)};
 

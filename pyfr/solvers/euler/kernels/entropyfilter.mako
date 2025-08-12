@@ -85,11 +85,11 @@
 </%pyfr:macro>
 
 <%pyfr:kernel name='entropyfilter' ndim='1'
-              u='inout fpdtype_t[${str(nupts)}][${str(nvars)}]'
-              entmin_int='inout fpdtype_t[${str(nfaces)}]'
-              vdm='in broadcast fpdtype_t[${str(nefpts)}][${str(nupts)}]'
-              invvdm='in broadcast fpdtype_t[${str(nupts)}][${str(nupts)}]'
-              m0='in broadcast fpdtype_t[${str(nfpts)}][${str(nupts)}]'>
+              u='inout fpdtype_t[${fmt(nupts)}][${fmt(nvars)}]'
+              entmin_int='inout fpdtype_t[${fmt(nfaces)}]'
+              vdm='in broadcast fpdtype_t[${fmt(nefpts)}][${fmt(nupts)}]'
+              invvdm='in broadcast fpdtype_t[${fmt(nupts)}][${fmt(nupts)}]'
+              m0='in broadcast fpdtype_t[${fmt(nfpts)}][${fmt(nupts)}]'>
     fpdtype_t dmin, pmin, emin;
     fpdtype_t Rgas = ${c['R']}, ag = ${c['a']}, bg = ${c['b']}, cvg = ${c['cv']};
 
