@@ -67,10 +67,11 @@ class TurbulencePlugin(BaseSolverPlugin):
         beta3 = 0.01*ti*avgu*(gc/sigma)**3
 
         if not ac:
-            gamma = self.cfg.getfloat('constants', 'gamma')
+            consts = self.cfg.items_as('constants', float)
+            R, a, b, cv = (consts[k] for k in ('R', 'a', 'b', 'cv'))
             avgrho = self.cfg.getfloat(cfgsect, 'avg-rho')
             avgmach = self.cfg.getfloat(cfgsect, 'avg-mach')
-            beta2 = (avgrho/avgu)*(gamma - 1)*avgmach**2
+            beta2 = (avgrho/avgu)*(R/cv)*avgmach**2
         else:
             beta2 = 0
 

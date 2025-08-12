@@ -6,6 +6,7 @@ from pyfr.mpiutil import get_comm_rank_root, mpi
 from pyfr.plugins.base import (BaseSolnPlugin, DatasetAppender,
                                init_csv, open_hdf5_a)
 from pyfr.quadrules.surface import SurfaceIntegrator
+from pyfr.thermo import real_gas as rg
 
 
 class FluidForceIntegrator(SurfaceIntegrator):
@@ -265,7 +266,9 @@ class FluidForcePlugin(BaseSolnPlugin):
         mu = c['mu']
 
         if self._viscorr == 'sutherland':
-            cpT = c['gamma']*(E/rho - 0.5*np.sum(u[1:-1]**2, axis=0)/rho**2)
+            e = E/rho - 0.5*np.sum(u[1:-1]**2, axis=0)/rho**2
+            T = rg.T_from_rho_e(rho, e, cv=c['cv'], a=c['a'])
+            cpT = (c['cv'] + c['R'])*T
             Trat = cpT/c['cpTref']
             mu *= (c['cpTref'] + c['cpTs'])*Trat**1.5 / (cpT + c['cpTs'])
 
