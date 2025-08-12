@@ -19,6 +19,6 @@ class NavierStokesSystem(BaseAdvectionDiffusionSystem):
         rg_consts = [('R', rg.R), ('a', rg.A), ('b', rg.B), ('cv', rg.CV)]
         for k, v in rg_consts:
             if not cfg.hasopt('constants', k):
-                cfg.set('constants', k, str(v))
+                cfg.set('constants', k, v)
 
         super().__init__(backend, mesh, initsoln, nregs, cfg)
