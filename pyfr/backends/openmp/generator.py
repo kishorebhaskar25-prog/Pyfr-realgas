@@ -47,7 +47,7 @@ class OpenMPKernelGenerator(BaseKernelGenerator):
                     }}
                 }}'''
 
-        return f'''
+        src = f'''
             struct {self.name}_kargs {{ {kargdefn}; }};
             void {self.name}(ixdtype_t _ib,
                              const struct {self.name}_kargs *args,
@@ -70,6 +70,8 @@ class OpenMPKernelGenerator(BaseKernelGenerator):
                 #undef X_IDX_AOSOA
                 #undef BCAST_BLK
             }}'''
+
+        return self._postprocess_src(src)
 
     def ldim_size(self, name, factor=1):
         return f'{factor}*BLK_SZ' if factor > 1 else 'BLK_SZ'

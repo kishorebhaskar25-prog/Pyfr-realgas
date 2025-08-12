@@ -104,8 +104,12 @@ def test_single_precision_literal_suffix():
     loader.exec_module(generator_mod)
     BaseKernelGenerator = generator_mod.BaseKernelGenerator
 
-    g = BaseKernelGenerator('foo', 1, {}, 'fpdtype_t a = 1.0;', np.float32, np.int32)
-    assert '1.0f' in g.body
+    class DummyKernelGenerator(BaseKernelGenerator):
+        def render(self):
+            return self._postprocess_src(self.body)
+
+    g = DummyKernelGenerator('foo', 1, {}, 'fpdtype_t a = 1.0;', np.float32, np.int32)
+    assert '1.0f' in g.render()
 
 
 def test_double_precision_literal_suffix():
@@ -116,5 +120,9 @@ def test_double_precision_literal_suffix():
     loader.exec_module(generator_mod)
     BaseKernelGenerator = generator_mod.BaseKernelGenerator
 
-    g = BaseKernelGenerator('foo', 1, {}, 'fpdtype_t a = 1.0;', np.float64, np.int32)
-    assert '1.0f' not in g.body
+    class DummyKernelGenerator(BaseKernelGenerator):
+        def render(self):
+            return self._postprocess_src(self.body)
+
+    g = DummyKernelGenerator('foo', 1, {}, 'fpdtype_t a = 1.0;', np.float64, np.int32)
+    assert '1.0f' not in g.render()
