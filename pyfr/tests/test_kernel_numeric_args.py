@@ -36,7 +36,7 @@ def test_float_coercion():
     tplsrc = """
 <%
 _kernel_argspecs['foo'] = (0, [], [])
-name = 'coef_' + fmt(x)
+name = f'coef_{x}'
 %>
 ${name}
 """
@@ -47,7 +47,7 @@ ${name}
     tplargs = {'x': np.float64(1 / 3)}
     src, ndim, argn, argt = provider._render_kernel('foo', 'foo', {}, tplargs)
 
-    assert 'coef_0.33333333333333331' in src
+    assert 'coef_0.3333333333333333' in src
 
 
 def test_integer_range_loop():
@@ -74,7 +74,7 @@ def test_numeric_param_multiplication():
 <%
 _kernel_argspecs['foo'] = (0, [], [])
 %>
-${fmt(a*b)}
+${a*b}
 """
 
     backend = DummyBackend(tplsrc)
@@ -83,5 +83,5 @@ ${fmt(a*b)}
     tplargs = {'a': np.int32(2), 'b': np.float64(1 / 3)}
     src, ndim, argn, argt = provider._render_kernel('foo', 'foo', {}, tplargs)
 
-    assert '0.66666666666666663' in src
+    assert '0.6666666666666666' in src
 

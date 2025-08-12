@@ -2,7 +2,6 @@ import importlib.machinery as imm
 import importlib.util as imu
 from pathlib import Path
 
-import numpy as np
 from mako.template import Template
 
 # Import BasePointwiseKernelProvider without triggering backend initialisation
@@ -36,7 +35,7 @@ def test_render_kernel_numeric_coercion():
 <%
 _kernel_argspecs['foo'] = (0, [], [])
 %>
-${x} ${fmt(x)}
+${x} ${x}
 '''
     backend = DummyBackend(tplsrc)
     provider = DummyProvider(backend)
@@ -44,5 +43,4 @@ ${x} ${fmt(x)}
     tplargs = {'x': 1 / 3}
     src, ndim, argn, argt = provider._render_kernel('foo', 'foo', {}, tplargs)
 
-    assert '0.3333333333333333' in src
-    assert '0.33333333333333331' in src
+    assert src.count('0.3333333333333333') == 2
