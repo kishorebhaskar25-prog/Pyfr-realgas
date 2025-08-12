@@ -4,6 +4,7 @@
 
 <%pyfr:macro name='rsolve' params='ul, ur, n, nf, R=${R}, a=${a}, b=${b}, cv=${cv}'>
     fpdtype_t utl[${nvars}], utr[${nvars}], ntf[${nvars}];
+    fpdtype_t Rgas = R, ag = a, bg = b, cvg = cv;
 
     utl[0] = ul[0];
     utr[0] = ur[0];
@@ -13,7 +14,7 @@
     ${pyfr.expand('transform_to', 'n', 'ul', 'utl', off=1)};
     ${pyfr.expand('transform_to', 'n', 'ur', 'utr', off=1)};
 
-    ${pyfr.expand('rsolve_1d', 'utl', 'utr', 'ntf', 'R', 'a', 'b', 'cv')};
+    ${pyfr.expand('rsolve_1d', 'utl', 'utr', 'ntf', 'Rgas', 'ag', 'bg', 'cvg')};
 
     nf[0] = ntf[0];
     nf[${nvars - 1}] = ntf[${nvars - 1}];
