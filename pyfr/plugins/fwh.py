@@ -6,6 +6,7 @@ from pyfr.mpiutil import get_comm_rank_root, mpi
 from pyfr.nputil import npeval
 from pyfr.plugins.base import BaseSolnPlugin, SurfaceRegionMixin, init_csv
 from pyfr.quadrules.surface import SurfaceIntegrator
+from pyfr.thermo import real_gas as rg
 from pyfr.util import first
 
 
@@ -93,8 +94,9 @@ class FWHPlugin(SurfaceRegionMixin, BaseSolnPlugin):
         self._vidx = [x in 'uvw' for x in privars]
         self._pidx = privars.index('p')
         self.consts = self.cfg.items_as('constants', float)
+        R, a, b, cv = (self.consts[k] for k in ('R', 'a', 'b', 'cv'))
 
-        qinf = {k: npeval(self.cfg.getexpr(cfgsect, k), self.consts) 
+        qinf = {k: npeval(self.cfg.getexpr(cfgsect, k), self.consts)
                 for k in privars}
         self.uinf = np.array([[qinf[k]] for k in 'uvw'[:self.ndims]])
 
@@ -102,8 +104,9 @@ class FWHPlugin(SurfaceRegionMixin, BaseSolnPlugin):
             qinf['rho'] = self.cfg.getfloat(cfgsect, 'rho')
             qinf['c'] = self.cfg.getfloat(cfgsect, 'c')
         else:
-            gamma = self.consts['gamma']
-            qinf['c'] = (gamma * qinf['p'] / qinf['rho'])**0.5
+            rho, p = qinf['rho'], qinf['p']
+            T = (p + a*rho**2)*(1.0/rho - b)/R
+            qinf['c'] = rg.sound_speed_sq(rho, T, R=R, a=a, b=b, cv=cv)**0.5
             self._ridx = privars.index('rho')
 
         qinf['M'] = np.array([qinf[k] / qinf['c'] for k in 'uvw'[:self.ndims]])
@@ -132,7 +135,7 @@ class FWHPlugin(SurfaceRegionMixin, BaseSolnPlugin):
             rho = pris[self._ridx]
 
             # Apply no-slip
-            pris[self._pidx] += 0.5*(self.consts['gamma'] - 1)*rho*vmag
+            pris[self._pidx] += 0.5*(self.consts['R']/self.consts['cv'])*rho*vmag
 
     def _fwh_solve(self, intg):
         o_vals = np.zeros(self.nobvs)
