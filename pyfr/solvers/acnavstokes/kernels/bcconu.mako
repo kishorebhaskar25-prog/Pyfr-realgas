@@ -10,5 +10,9 @@
     fpdtype_t mag_nl = sqrt(${pyfr.dot('nlin[{i}]', i=ndims)});
     fpdtype_t norm_nl[] = ${pyfr.array('(1 / mag_nl)*nlin[{i}]', i=ndims)};
 
-    ${pyfr.expand('bc_ldg_state', 'ulin', 'norm_nl', 'ulout')};
+    fpdtype_t Rgas = ${R}, ag = ${a}, bg = ${b}, cvg = ${cv},
+              cpg = ${cp}, T0 = ${T}, p0 = ${pinf};
+
+    ${pyfr.expand('bc_ldg_state', 'ulin', 'norm_nl', 'ulout',
+                  'Rgas', 'ag', 'bg', 'cvg', 'cpg', 'T0', 'p0')};
 </%pyfr:kernel>

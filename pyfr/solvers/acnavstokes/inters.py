@@ -1,6 +1,7 @@
 from pyfr.solvers.baseadvecdiff import (BaseAdvectionDiffusionBCInters,
                                         BaseAdvectionDiffusionIntInters,
                                         BaseAdvectionDiffusionMPIInters)
+from pyfr.thermo import real_gas as rg
 
 
 class ACNavierStokesIntInters(BaseAdvectionDiffusionIntInters):
@@ -9,8 +10,15 @@ class ACNavierStokesIntInters(BaseAdvectionDiffusionIntInters):
 
         # Pointwise template arguments
         rsolver = self.cfg.get('solver-interfaces', 'riemann-solver')
+        for k, v in [('R', rg.R), ('a', rg.A), ('b', rg.B),
+                     ('cv', rg.CV), ('cp', rg.CV + rg.R),
+                     ('T', 0.0), ('pinf', 0.0)]:
+            self.c.setdefault(k, v)
+
         tplargs = dict(ndims=self.ndims, nvars=self.nvars, rsolver=rsolver,
-                       c=self.c)
+                       c=self.c, R=self.c['R'], a=self.c['a'],
+                       b=self.c['b'], cv=self.c['cv'], cp=self.c['cp'],
+                       T=self.c['T'], pinf=self.c['pinf'])
 
         kprefix = 'pyfr.solvers.acnavstokes.kernels'
         self._be.pointwise.register(f'{kprefix}.intconu')
@@ -35,8 +43,15 @@ class ACNavierStokesMPIInters(BaseAdvectionDiffusionMPIInters):
 
         # Pointwise template arguments
         rsolver = self.cfg.get('solver-interfaces', 'riemann-solver')
+        for k, v in [('R', rg.R), ('a', rg.A), ('b', rg.B),
+                     ('cv', rg.CV), ('cp', rg.CV + rg.R),
+                     ('T', 0.0), ('pinf', 0.0)]:
+            self.c.setdefault(k, v)
+
         tplargs = dict(ndims=self.ndims, nvars=self.nvars, rsolver=rsolver,
-                       c=self.c)
+                       c=self.c, R=self.c['R'], a=self.c['a'],
+                       b=self.c['b'], cv=self.c['cv'], cp=self.c['cp'],
+                       T=self.c['T'], pinf=self.c['pinf'])
 
         kprefix = 'pyfr.solvers.acnavstokes.kernels'
         self._be.pointwise.register(f'{kprefix}.mpiconu')
@@ -62,9 +77,16 @@ class ACNavierStokesBaseBCInters(BaseAdvectionDiffusionBCInters):
 
         # Pointwise template arguments
         rsolver = self.cfg.get('solver-interfaces', 'riemann-solver')
+        for k, v in [('R', rg.R), ('a', rg.A), ('b', rg.B),
+                     ('cv', rg.CV), ('cp', rg.CV + rg.R),
+                     ('T', 0.0), ('pinf', 0.0)]:
+            self.c.setdefault(k, v)
+
         tplargs = dict(ndims=self.ndims, nvars=self.nvars, rsolver=rsolver,
                        c=self.c, bctype=self.type,
-                       bccfluxstate=self.cflux_state)
+                       bccfluxstate=self.cflux_state, R=self.c['R'],
+                       a=self.c['a'], b=self.c['b'], cv=self.c['cv'],
+                       cp=self.c['cp'], T=self.c['T'], pinf=self.c['pinf'])
 
         self._be.pointwise.register('pyfr.solvers.acnavstokes.kernels.bcconu')
         self._be.pointwise.register('pyfr.solvers.acnavstokes.kernels.bccflux')

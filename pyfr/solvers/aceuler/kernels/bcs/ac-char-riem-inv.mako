@@ -1,6 +1,6 @@
 <%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
 
-<%pyfr:macro name='bc_rsolve_state' params='ul, nl, ur' externs='ploc, t'>
+<%pyfr:macro name='bc_rsolve_state' params='ul, nl, ur, Rgas, ag, bg, cvg, cpg, T0, p0' externs='ploc, t'>
     fpdtype_t zeta = ${c['bc-ac-zeta']};
 
     fpdtype_t V_e = ${' + '.join('{0}*nl[{1}]'.format(c['uvw'[i]], i)
