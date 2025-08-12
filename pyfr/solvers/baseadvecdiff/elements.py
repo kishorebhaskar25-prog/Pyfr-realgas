@@ -138,7 +138,7 @@ class BaseAdvectionDiffusionElements(BaseAdvectionElements):
 
             # Allocate space for the artificial viscosity vector
             self.artvisc = self._be.matrix((1, self.neles),
-                                           extent=nonce + 'artvisc', tags=tags)
+                                           extent=f'{nonce}artvisc', tags=tags)
 
             # Apply the sensor to estimate the required artificial viscosity
             kernels['shocksensor'] = lambda uin: kernel(

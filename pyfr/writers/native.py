@@ -43,9 +43,10 @@ class NativeWriter:
         self._ecounts = {etype: len(mesh.eidxs.get(etype, []))
                          for etype in mesh.etypes}
 
-        # Append the relevant extension
+        # Ensure basename is a string and append the relevant extension
+        basename = str(basename)
         if not basename.endswith(extn):
-            basename += extn
+            basename = f'{basename}{extn}'
 
         # Output counter (incremented each time write() is called)
         self.fgen = file_path_gen(basedir, basename, isrestart)

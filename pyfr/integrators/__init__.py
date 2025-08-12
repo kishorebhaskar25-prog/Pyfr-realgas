@@ -24,7 +24,7 @@ def get_integrator(backend, systemcls, mesh, initsoln, cfg):
         raise ValueError('Invalid integrator formulation')
 
     # Determine the integrator name
-    name = '_'.join([form, cn, sn, 'integrator'])
+    name = '_'.join(map(str, [form, cn, sn, 'integrator']))
     name = re.sub('(?:^|_|-)([a-z])', lambda m: m[1].upper(), name)
 
     # Composite the base classes together to form a new type

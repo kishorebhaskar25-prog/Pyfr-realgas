@@ -214,7 +214,7 @@ class NativeReader:
             pname = einfo = ninfo = None
 
         # Broadcast this metadata
-        ppath = 'partitionings/' + comm.bcast(pname, root=root)
+        ppath = f'partitionings/{comm.bcast(pname, root=root)}'
         einfo = comm.scatter(einfo, root=root)
         self.neighbours = comm.scatter(ninfo, root=root)
 

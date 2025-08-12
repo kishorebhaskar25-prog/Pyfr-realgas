@@ -109,7 +109,7 @@ def npeval(expr, locals):
         raise ValueError('Invalid characters in expression')
 
     # Disallow access to object attributes
-    objs = '|'.join(it.chain(_npeval_syms, locals))
+    objs = '|'.join(map(str, it.chain(_npeval_syms, locals)))
     if re.search(rf'({objs}|\))\s*\.', expr):
         raise ValueError('Invalid expression')
 

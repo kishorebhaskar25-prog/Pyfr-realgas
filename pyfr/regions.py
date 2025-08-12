@@ -348,7 +348,7 @@ class ConstructiveRegion(BaseGeometricRegion):
         # Factor out the individual region expressions
         rexprs = []
         self.expr = re.sub(
-            r'(\w+)\((' + match_paired_paren('()') + r')\)',
+            rf'(\w+)\(({match_paired_paren("()")})\)',
             lambda m: rexprs.append(m.groups()) or f'r{len(rexprs) - 1}',
             expr
         )
@@ -367,7 +367,7 @@ class ConstructiveRegion(BaseGeometricRegion):
                 args = re.sub(fr'{k}\s*=\s*', f'(None, "{k}"), ', args)
 
             # Evaluate the arguments
-            argit = iter(literal_eval(args + ','))
+            argit = iter(literal_eval(f'{args},'))
 
             # Prepare the argument list
             kargs, kwargs = [], {'rdata': rdata}

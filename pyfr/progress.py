@@ -223,10 +223,10 @@ class ProgressSequence:
     def start_with_sequence(self, phase):
         prefix, tstart = self._start_phase(phase)
 
-        sys.stderr.write(prefix + '\n')
+        sys.stderr.write(f'{prefix}\n')
         sys.stderr.flush()
 
-        yield ProgressSequence(prefix=self._prefix + '  ')
+        yield ProgressSequence(prefix=f'{self._prefix}  ')
 
     @contextlib.contextmanager
     def start_with_bar(self, phase):
