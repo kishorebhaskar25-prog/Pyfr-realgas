@@ -92,6 +92,14 @@ class BasePointwiseKernelProvider(BaseKernelProvider):
         # Macro definitions
         tplargs['_macros'] = {}
 
+        def fmt_float(x):
+            if isinstance(x, (float, np.floating)):
+                return np.format_float_positional(x, trim='-')
+            else:
+                return str(x)
+
+        tplargs['fmt'] = fmt_float
+
         # External kernel arguments dictionary
         tplargs['_extrns'] = extrns
 
