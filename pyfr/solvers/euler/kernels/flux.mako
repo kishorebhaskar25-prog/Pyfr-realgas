@@ -1,6 +1,6 @@
 <%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
 
-<%pyfr:macro name='inviscid_flux' params='s, f, p, c, v'>
+<%pyfr:macro name='inviscid_flux' params='s, f, p, c, v, R, a, b, cv'>
     fpdtype_t rho = s[0], invrho = 1.0/rho, E = s[${nvars - 1}];
 
     // Compute the velocities
@@ -35,7 +35,7 @@
 % endfor
 </%pyfr:macro>
 
-<%pyfr:macro name='inviscid_flux_1d' params='s, f, p, c, v'>
+<%pyfr:macro name='inviscid_flux_1d' params='s, f, p, c, v, R, a, b, cv'>
     fpdtype_t rho = s[0], invrho = 1.0/rho, E = s[${nvars - 1}];
 
     // Compute the velocities

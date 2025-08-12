@@ -7,8 +7,10 @@
     fpdtype_t vl[${ndims}], vr[${ndims}];
     fpdtype_t pl, pr, cl, cr;
 
-    ${pyfr.expand('inviscid_flux', 'ul', 'fl', 'pl', 'cl', 'vl')};
-    ${pyfr.expand('inviscid_flux', 'ur', 'fr', 'pr', 'cr', 'vr')};
+    fpdtype_t Rgas = ${c['R']}, ag = ${c['a']}, bg = ${c['b']}, cvg = ${c['cv']};
+
+    ${pyfr.expand('inviscid_flux', 'ul', 'fl', 'pl', 'cl', 'vl', 'Rgas', 'ag', 'bg', 'cvg')};
+    ${pyfr.expand('inviscid_flux', 'ur', 'fr', 'pr', 'cr', 'vr', 'Rgas', 'ag', 'bg', 'cvg')};
 
     // Sum the left and right velocities and take the normal
     fpdtype_t nv = ${pyfr.dot('n[{i}]', 'vl[{i}] + vr[{i}]', i=ndims)};
