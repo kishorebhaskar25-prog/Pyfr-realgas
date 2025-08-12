@@ -1,15 +1,22 @@
 <%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
 
-<%pyfr:macro name='inviscid_flux' params='s, f'>
-   // Velocity in the indices 1 to ndims+1 of the conservative variable array
-   fpdtype_t v[] = ${pyfr.array('s[{i}]', i=(1, ndims + 1))};
+<%!
+from pyfr.thermo import real_gas as rg
+%>
 
-    // Pressure in the conservative variable array index 0
+<%pyfr:macro name='inviscid_flux' params='s, f, Rgas, ag, bg, T0, p0'>
+    // Base-state density from the van der Waals equation of state
+    const fpdtype_t rho0 = ${rg.rho_from_pT(p0, T0, Rgas, ag, bg)};
+
+    // Velocity components
+    fpdtype_t v[] = ${pyfr.array('s[{i}]', i=(1, ndims + 1))};
+
+    // Pressure perturbation
     fpdtype_t p = s[0];
 
-    // Mass flux
+    // Mass flux (rho0 * v)
 % for i in range(ndims):
-    f[${i}][0] = ${c['ac-zeta']}*v[${i}];
+    f[${i}][0] = rho0*v[${i}];
 % endfor
 
     // Momentum fluxes

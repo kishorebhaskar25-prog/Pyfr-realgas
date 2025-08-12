@@ -20,7 +20,7 @@
 
     // Perform the Riemann solve
     fpdtype_t ficomm[${nvars}], fvcomm;
-    ${pyfr.expand('rsolve', 'ul', 'ur', 'nl', 'ficomm')};
+    ${pyfr.expand('rsolve', 'ul', 'ur', 'nl', 'ficomm', 'Rgas', 'ag', 'bg', 'cvg', 'T0', 'p0')};
 
 % for i in range(nvars):
     fvcomm = ${' + '.join(f'nl[{j}]*fvr[{j}][{i}]' for j in range(ndims))};
