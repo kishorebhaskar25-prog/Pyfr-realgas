@@ -52,12 +52,19 @@ class NavierStokesElements(BaseFluidElements, BaseAdvectionDiffusionElements):
         if visc_corr not in {'sutherland', 'none'}:
             raise ValueError('Invalid viscosity-correction option')
 
+        # Constants for the flux kernels
+        c = self.cfg.items_as('constants', float)
+        c.setdefault('R', rg.R)
+        c.setdefault('a', rg.A)
+        c.setdefault('b', rg.B)
+        c.setdefault('cv', rg.CV)
+
         # Template parameters for the flux kernels
         tplargs = {
             'ndims': self.ndims,
             'nvars': self.nvars,
             'nverts': len(self.basis.linspts),
-            'c': self.cfg.items_as('constants', float),
+            'c': c,
             'jac_exprs': self.basis.jac_exprs,
             'shock_capturing': shock_capturing,
             'visc_corr': visc_corr

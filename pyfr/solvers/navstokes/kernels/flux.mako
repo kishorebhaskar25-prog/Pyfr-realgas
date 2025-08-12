@@ -19,19 +19,25 @@
     fpdtype_t E_x = grad_uin[0][3];
     fpdtype_t E_y = grad_uin[1][3];
 
+    // Internal energy and temperature
+    fpdtype_t e = rcprho*E - 0.5*(u*u + v*v);
+    fpdtype_t T = (e + ${c['a']}*rho)/${c['cv']};
+
+    // Viscosity (optionally via Sutherland's law)
+    fpdtype_t cpT = (${c['R']} + ${c['cv']})*T;
 % if visc_corr == 'sutherland':
-    // Compute the temperature and viscosity
-    fpdtype_t cpT = ${c['gamma']}*(rcprho*E - 0.5*(u*u + v*v));
-    fpdtype_t Trat = ${1/c['cpTref']}*cpT;
+    fpdtype_t Trat = cpT/${c['cpTref']};
     fpdtype_t mu_c = ${c['mu']*(c['cpTref'] + c['cpTs'])}*Trat*sqrt(Trat)
                    / (cpT + ${c['cpTs']});
 % else:
     fpdtype_t mu_c = ${c['mu']};
 % endif
 
-    // Compute temperature derivatives (c_v*dT/d[x,y])
-    fpdtype_t T_x = rcprho*(E_x - (rcprho*rho_x*E + u*u_x + v*v_x));
-    fpdtype_t T_y = rcprho*(E_y - (rcprho*rho_y*E + u*u_y + v*v_y));
+    // Temperature derivatives (c_v*dT/d[x,y])
+    fpdtype_t T_x = rcprho*(E_x - (rcprho*rho_x*E + u*u_x + v*v_x))
+                    + ${c['a']}*rho_x;
+    fpdtype_t T_y = rcprho*(E_y - (rcprho*rho_y*E + u*u_y + v*v_y))
+                    + ${c['a']}*rho_y;
 
     // Negated stress tensor elements
     fpdtype_t t_xx = -2*mu_c*rcprho*(u_x - ${1.0/3.0}*(u_x + v_y));
@@ -41,8 +47,10 @@
     fout[0][1] += t_xx;     fout[1][1] += t_xy;
     fout[0][2] += t_xy;     fout[1][2] += t_yy;
 
-    fout[0][3] += u*t_xx + v*t_xy + -mu_c*${c['gamma']/c['Pr']}*T_x;
-    fout[1][3] += u*t_xy + v*t_yy + -mu_c*${c['gamma']/c['Pr']}*T_y;
+    fout[0][3] += u*t_xx + v*t_xy
+                 + -mu_c*${(c['cv'] + c['R'])/(c['cv']*c['Pr'])}*T_x;
+    fout[1][3] += u*t_xy + v*t_yy
+                 + -mu_c*${(c['cv'] + c['R'])/(c['cv']*c['Pr'])}*T_y;
 </%pyfr:macro>
 % elif ndims == 3:
 <%pyfr:macro name='viscous_flux_add' params='uin, grad_uin, fout'>
@@ -72,10 +80,14 @@
     fpdtype_t E_y = grad_uin[1][4];
     fpdtype_t E_z = grad_uin[2][4];
 
+    // Internal energy and temperature
+    fpdtype_t e = rcprho*E - 0.5*(u*u + v*v + w*w);
+    fpdtype_t T = (e + ${c['a']}*rho)/${c['cv']};
+
+    // Viscosity (optionally via Sutherland's law)
+    fpdtype_t cpT = (${c['R']} + ${c['cv']})*T;
 % if visc_corr == 'sutherland':
-    // Compute the temperature and viscosity
-    fpdtype_t cpT = ${c['gamma']}*(rcprho*E - 0.5*(u*u + v*v + w*w));
-    fpdtype_t Trat = ${1/c['cpTref']}*cpT;
+    fpdtype_t Trat = cpT/${c['cpTref']};
     fpdtype_t mu_c = ${c['mu']*(c['cpTref'] + c['cpTs'])}*Trat*sqrt(Trat)
                    / (cpT + ${c['cpTs']});
 % else:
@@ -83,9 +95,12 @@
 % endif
 
     // Compute temperature derivatives (c_v*dT/d[x,y,z])
-    fpdtype_t T_x = rcprho*(E_x - (rcprho*rho_x*E + u*u_x + v*v_x + w*w_x));
-    fpdtype_t T_y = rcprho*(E_y - (rcprho*rho_y*E + u*u_y + v*v_y + w*w_y));
-    fpdtype_t T_z = rcprho*(E_z - (rcprho*rho_z*E + u*u_z + v*v_z + w*w_z));
+    fpdtype_t T_x = rcprho*(E_x - (rcprho*rho_x*E + u*u_x + v*v_x + w*w_x))
+                    + ${c['a']}*rho_x;
+    fpdtype_t T_y = rcprho*(E_y - (rcprho*rho_y*E + u*u_y + v*v_y + w*w_y))
+                    + ${c['a']}*rho_y;
+    fpdtype_t T_z = rcprho*(E_z - (rcprho*rho_z*E + u*u_z + v*v_z + w*w_z))
+                    + ${c['a']}*rho_z;
 
     // Negated stress tensor elements
     fpdtype_t t_xx = -2*mu_c*rcprho*(u_x - ${1.0/3.0}*(u_x + v_y + w_z));
@@ -99,8 +114,11 @@
     fout[0][2] += t_xy;     fout[1][2] += t_yy;     fout[2][2] += t_yz;
     fout[0][3] += t_xz;     fout[1][3] += t_yz;     fout[2][3] += t_zz;
 
-    fout[0][4] += u*t_xx + v*t_xy + w*t_xz + -mu_c*${c['gamma']/c['Pr']}*T_x;
-    fout[1][4] += u*t_xy + v*t_yy + w*t_yz + -mu_c*${c['gamma']/c['Pr']}*T_y;
-    fout[2][4] += u*t_xz + v*t_yz + w*t_zz + -mu_c*${c['gamma']/c['Pr']}*T_z;
+    fout[0][4] += u*t_xx + v*t_xy + w*t_xz
+                 + -mu_c*${(c['cv'] + c['R'])/(c['cv']*c['Pr'])}*T_x;
+    fout[1][4] += u*t_xy + v*t_yy + w*t_yz
+                 + -mu_c*${(c['cv'] + c['R'])/(c['cv']*c['Pr'])}*T_y;
+    fout[2][4] += u*t_xz + v*t_yz + w*t_zz
+                 + -mu_c*${(c['cv'] + c['R'])/(c['cv']*c['Pr'])}*T_z;
 </%pyfr:macro>
 % endif
