@@ -2,9 +2,10 @@
 
 class CSVStream:
     def __init__(self, fname, *, header=None, nflush=100):
-        # Append the '.csv' extension
+        # Ensure fname is a string and append the '.csv' extension
+        fname = str(fname)
         if not fname.endswith('.csv'):
-            fname += '.csv'
+            fname = f'{fname}.csv'
 
         # Open file for appending
         self.outf = open(fname, 'a')

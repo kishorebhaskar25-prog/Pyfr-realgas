@@ -7,7 +7,7 @@ import re
 
 def _ensure_float(m):
     m = m[0]
-    return m if any(c in m for c in '.eE') else m + '.'
+    return m if any(c in m for c in '.eE') else f'{m}.'
 
 
 _sentinel = object()
@@ -79,7 +79,7 @@ class Inifile:
 
         # Substitute variables
         if subs:
-            expr = re.sub(r'\b({0})\b'.format('|'.join(subs)),
+            expr = re.sub(r'\b({0})\b'.format('|'.join(map(str, subs))),
                           lambda m: str(subs[m[1]]), expr)
 
         # Convert integers not inside [] to floats

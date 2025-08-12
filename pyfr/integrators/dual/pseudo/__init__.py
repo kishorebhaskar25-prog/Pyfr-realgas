@@ -36,7 +36,7 @@ def get_pseudo_integrator(backend, systemcls, mesh, initsoln, cfg, stepnregs,
         pc = get_pseudo_stepper_cls(pn, porder)
 
         # Determine the integrator name
-        name = '_'.join(['dual', cn, pn, 'pseudointegrator'])
+        name = '_'.join(map(str, ['dual', cn, pn, 'pseudointegrator']))
         name = re.sub('(?:^|_|-)([a-z])', lambda m: m[1].upper(), name)
 
         pseudointegrator = type(name, (cc, pc), dict(name=name))

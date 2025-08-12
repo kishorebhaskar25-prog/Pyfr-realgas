@@ -135,7 +135,7 @@ class BaseKernelGenerator:
 
     def _match_arg(self, arg):
         bmtch = r'\[({0})\]'.format(match_paired_paren('[]'))
-        ptrns = [r'\b{0}\b', r'\b{0}' + bmtch, r'\b{0}' + 2*bmtch]
+        ptrns = [r'\b{0}\b', fr'\b{{0}}{bmtch}', fr'\b{{0}}{bmtch*2}']
 
         return ptrns[arg.ncdim].format(arg.name)
 
@@ -253,7 +253,7 @@ class BaseKernelGenerator:
                     body += f'{afun}(&{darg}, {va.name});\n'
                 else:
                     for ij in ndrange(*va.cdims):
-                        lval = va.name + ''.join(f'[{i}]' for i in ij)
+                        lval = f"{va.name}{''.join(f'[{i}]' for i in ij)}"
                         gval = re.sub(subp, darg, lval)
 
                         body += f'{afun}(&{gval}, {lval});\n'
