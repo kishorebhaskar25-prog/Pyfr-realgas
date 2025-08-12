@@ -7,12 +7,14 @@ from pyfr.thermo import real_gas as rg
 
 <%pyfr:macro name='rsolve' params='ul, ur, n, nf, R, a, b, cv, T0, p0'>
     const fpdtype_t rho0 = ${rg.rho_from_pT(p0, T0, R, a, b)};
-    const fpdtype_t c0 = sqrt(${rg.sound_speed_sq(rho0, T0, R, a, b, cv)});
+    const fpdtype_t ombr0 = 1.0 - b*rho0;
+    const fpdtype_t c0 = sqrt((R*T0/(ombr0*ombr0))*(1.0 + R/cv)
+                              - 2.0*a*rho0);
 
     fpdtype_t fl[${ndims}][${nvars}], fr[${ndims}][${nvars}];
 
-    ${pyfr.expand('inviscid_flux', 'ul', 'fl', 'R', 'a', 'b', 'T0', 'p0')};
-    ${pyfr.expand('inviscid_flux', 'ur', 'fr', 'R', 'a', 'b', 'T0', 'p0')};
+    ${pyfr.expand('inviscid_flux', 'ul', 'fl', 'R', 'a', 'b', 'cv', 'T0', 'p0')};
+    ${pyfr.expand('inviscid_flux', 'ur', 'fr', 'R', 'a', 'b', 'cv', 'T0', 'p0')};
 
     fpdtype_t vl[${ndims}] = ${pyfr.array('ul[{i}]', i=(1, ndims + 1))};
     fpdtype_t vr[${ndims}] = ${pyfr.array('ur[{i}]', i=(1, ndims + 1))};

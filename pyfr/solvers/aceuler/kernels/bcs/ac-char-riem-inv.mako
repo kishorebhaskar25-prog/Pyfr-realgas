@@ -6,7 +6,9 @@ from pyfr.thermo import real_gas as rg
 
 <%pyfr:macro name='bc_rsolve_state' params='ul, nl, ur, Rgas, ag, bg, cvg, T0, p0' externs='ploc, t'>
     const fpdtype_t rho0 = ${rg.rho_from_pT(p0, T0, Rgas, ag, bg)};
-    const fpdtype_t zeta = ${rg.sound_speed_sq(rho0, T0, Rgas, ag, bg, cvg)};
+    const fpdtype_t ombr0 = 1.0 - bg*rho0;
+    const fpdtype_t zeta = (Rgas*T0/(ombr0*ombr0))*(1.0 + Rgas/cvg)
+                         - 2.0*ag*rho0;
 
     fpdtype_t V_e = ${' + '.join('{0}*nl[{1}]'.format(c['uvw'[i]], i)
                                  for i in range(ndims))};
