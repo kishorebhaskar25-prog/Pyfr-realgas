@@ -42,7 +42,8 @@ class TplargsMixin:
 
         self._tplargs = dict(ndims=self.ndims, nvars=self.nvars,
                              rsolver=rsolver, c=self.c, p_min=self.p_min,
-                             R=rg.R, a=rg.A, b=rg.B, cv=rg.CV)
+                             R=self.c['R'], a=self.c['a'], b=self.c['b'],
+                             cv=self.c['cv'])
 
 
 class FluidMPIIntersMixin:
