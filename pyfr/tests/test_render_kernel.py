@@ -1,7 +1,9 @@
 import importlib.machinery as imm
 import importlib.util as imu
+import sys
 from pathlib import Path
 
+import numpy as np
 from mako.template import Template
 
 # Import BasePointwiseKernelProvider without triggering backend initialisation
@@ -11,6 +13,15 @@ spec = imu.spec_from_loader(loader.name, loader)
 kernels = imu.module_from_spec(spec)
 loader.exec_module(kernels)
 BasePointwiseKernelProvider = kernels.BasePointwiseKernelProvider
+
+# Load makoutil without importing the full pyfr.backends package to avoid
+# mpi4py dependency issues during testing.
+makoutil_path = Path(__file__).resolve().parents[1] / 'backends' / 'base' / 'makoutil.py'
+loader = imm.SourceFileLoader('makoutil_stub', str(makoutil_path))
+spec = imu.spec_from_loader(loader.name, loader)
+makoutil = imu.module_from_spec(spec)
+loader.exec_module(makoutil)
+sys.modules['makoutil_stub'] = makoutil
 
 
 class DummyLookup:
@@ -48,7 +59,7 @@ ${x} ${x}
 
 def test_render_kernel_helper_macro():
     tplsrc = """
-<%namespace module='pyfr.backends.base.makoutil' name='pyfr'/>
+<%namespace module='makoutil_stub' name='pyfr'/>
 <%
 _kernel_argspecs['foo'] = (0, [], [])
 %>
@@ -60,3 +71,26 @@ ${pyfr.dot('a[{i}]', i=3)}
     src, *_ = provider._render_kernel('foo', 'foo', {}, {})
 
     assert 'a[0]' in src and 'a[1]' in src and 'a[2]' in src
+
+
+def test_macro_numeric_expansion():
+    tplsrc = """
+<%namespace module='makoutil_stub' name='pyfr'/>
+<%
+_kernel_argspecs['foo'] = (0, [], [])
+import numpy as np
+%>
+<%pyfr:macro name='coeff' params='i, x'>
+idx = i;
+val = x;
+</%pyfr:macro>
+${pyfr.expand('coeff', np.int32(2), np.float64(1/3))}
+"""
+
+    backend = DummyBackend(tplsrc)
+    provider = DummyProvider(backend)
+
+    src, *_ = provider._render_kernel('foo', 'foo', {}, {})
+
+    assert 'idx = 2;' in src
+    assert 'val = 0.3333333333333333;' in src

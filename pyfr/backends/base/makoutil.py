@@ -143,6 +143,10 @@ def _locals(body):
 
 @supports_caller
 def macro(context, name, params, externs=''):
+    # Macros may be formed from numeric template arguments; ensure the
+    # name is a string prior to any further processing.
+    name = str(name)
+
     # Check we have not already been defined
     if name in context['_macros']:
         raise RuntimeError(f'Attempt to redefine macro "{name}"')
@@ -173,7 +177,35 @@ def macro(context, name, params, externs=''):
 
 
 def expand(context, name, /, *args, **kwargs):
+    # Expand may be called with numeric arguments originating from numpy
+    # types.  Coerce these into the corresponding Python primitives so
+    # that any downstream formatting, identifier construction or further
+    # manipulation behaves as expected.
+    def _coerce(v):
+        if isinstance(v, (bool, np.bool_)):
+            return bool(v)
+        elif isinstance(v, (int, np.integer)):
+            return int(v)
+        elif isinstance(v, (float, np.floating)):
+            return float(v)
+        elif isinstance(v, (str, bytes, np.str_, np.bytes_)):
+            try:
+                float(v)
+            except (TypeError, ValueError):
+                return str(v)
+            else:
+                raise TypeError('numeric value provided as string/bytes')
+        elif isinstance(v, list):
+            return [_coerce(i) for i in v]
+        elif isinstance(v, tuple):
+            return tuple(_coerce(i) for i in v)
+        elif isinstance(v, dict):
+            return {k: _coerce(val) for k, val in v.items()}
+        else:
+            return v
+
     # Get the macro parameter list and the body
+    name = str(name)
     mparams, mexterns, body = context['_macros'][name]
 
     # Ensure an appropriate number of arguments have been passed
@@ -181,12 +213,12 @@ def expand(context, name, /, *args, **kwargs):
         raise ValueError(f'Inconsistent macro parameter list in {name}')
 
     # Parse the parameter list
-    params = dict(zip(mparams, args))
+    params = dict(zip(mparams, map(_coerce, args)))
     for k, v in kwargs.items():
         if k in params:
             raise ValueError(f'Duplicate macro parameter {k} in {name}')
 
-        params[k] = v
+        params[k] = _coerce(v)
 
     # Ensure all parameters have been passed
     if sorted(mparams) != sorted(params):
@@ -207,6 +239,11 @@ def expand(context, name, /, *args, **kwargs):
 
 @supports_caller
 def kernel(context, name, ndim, **kwargs):
+    # Kernel names may be formed dynamically from numeric template
+    # arguments.  Ensure the resulting name is a string so that it can be
+    # used as a dictionary key and passed to the generator class.
+    name = str(name)
+
     extrns = context['_extrns']
 
     # Validate the argument list
@@ -235,5 +272,9 @@ def kernel(context, name, ndim, **kwargs):
 
 
 def alias(context, name, func):
+    # Allow for macros to be aliased using numeric template arguments.
+    name = str(name)
+    func = str(func)
+
     context['_macros'][name] = context['_macros'][func]
     return ''
